@@ -3,7 +3,6 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include "graph.hpp"
-
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1600, 800), "Projekt PWI");
@@ -16,16 +15,13 @@ int main()
     
     window.setFramerateLimit(100);
     int n = 3, m = 0;
-    //std::cin >> n >> m; 
     {
-        int n2 = n,m2 = m;
-        while (n2--) {
-            G.AddVertex(n2+1);
-        }
-        while (m2--) {
-            int v, w;
+        
+        for (int i = 0; i < n; ++i) G.AddVertex(Vertex(i));
+        for (int j = 0; j < m; ++j) {
+            int v,w;
             std::cin >> v >> w;
-            G.AddEdge(v,w);
+            G.AddEdge(Edge());
         }
     }
     while (window.isOpen())
@@ -36,7 +32,7 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        G.MoveVertices();
+        
         window.clear(sf::Color::White);        
         G.Draw(window);
         window.display();
