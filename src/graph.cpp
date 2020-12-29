@@ -4,6 +4,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <math.h>
+#include <iostream>
 #define pb push_back
 #define rep(i,a,b) for(int i = a; i <= b; i++)
 #define M_RAD 57.2957
@@ -22,10 +23,20 @@ float getAngleByCoordinates(float x, float y)//zwraca kat miedzy osia y+ zgodnie
 	if (x > 0 && y < 0) return 90.f + atan(fabs(y / x)) * M_RAD;
 	if (x < 0 && y < 0) return 270.f - atan(fabs(y / x)) * M_RAD;
 	if (x < 0 && y > 0) return 270.f + atan(fabs(y / x)) * M_RAD;
+    return 0;
 }
 
 float getLenght(sf::Vector2f p1, sf::Vector2f p2) {//odleglosc miedzy dwoma punktami w przestrzeni
 	return sqrtf(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+}
+
+Graph::Graph()
+{
+    if (!font.loadFromFile("Fonts/ABeeZee-Regular.ttf"))
+		throw("NIE MA CZCIONKI\n");
+        
+    isDirected = false;
+    isWeighted = false;
 }
 
 void Graph::RemoveVertex(int id) {
@@ -49,37 +60,41 @@ void Graph::RemoveVertex(int id) {
 
 void Graph::AddVertex(sf::Vector2f position){
     int newId = vertices.size();
-    std::string text1 = "";
+    sf::Text text1("",font);
 
-    Vertex vertexToAdd = Vertex(position, newId, text1);
+    Vertex vertexToAdd = Vertex(position, newId, font);
     vertices.push_back(vertexToAdd);
 }
 
 
-Vertex::Vertex(sf::Vector2f position, int id, std::string text1){
-    position = position;
-    text1 = text1;
+Vertex::Vertex(sf::Vector2f __position, int __id, sf::Font& font){
+    position = __position;
+	id = __id;
+    text1.setString(std::to_string(id));
+    text1.setFont(font);
     force = sf::Vector2f(0.f,0.f);
 }
 
-
-
 Edge::Edge(){
     idVertexFrom = idVertexTo = weight1 = weight2 = -1;
-    isHighlighted = isDeleted = false;
+    isHighlighted = false;
 }
 
-Edge::Edge(int v, int u, int w1, int w2) {
+Edge::Edge(int v, int w, int w1, int w2) {
     idVertexFrom = v;
-    idVertexTo = u;
+    idVertexTo = w;
     weight1 = w1;
     weight2 = w2;
-    isHighlighted = isDeleted = false;
+    isHighlighted = false;
 }
 
-void Graph::AddEdge(Edge edge) {
-    vertices[edge.idVertexFrom].edgesIdTo.pb(edge.idVertexTo);
-    vertices[edge.idVertexTo].edgesIdFrom.pb(edge.idVertexFrom);
+
+void Graph::AddEdge(int v,int w, int weight1=0, int weight2=0) {
+	Edge edge = Edge(v, w, weight1, weight2);
+	
+	edge.id = allEdges.size();
+    vertices[edge.idVertexFrom].edgesIdTo.pb(edge.id);
+    vertices[edge.idVertexTo].edgesIdFrom.pb(edge.id);
     allEdges.pb(edge);
 }
 
@@ -87,12 +102,14 @@ void Graph::RemoveEdgeFromVertex(int id,int v) {
     for (int i = 0; i < vertices[v].edgesIdFrom.size(); ++i) {
         if (vertices[v].edgesIdFrom[i] == id) {
             std::swap(vertices[v].edgesIdFrom[i],vertices[v].edgesIdFrom.back());
+            vertices[v].edgesIdFrom.pop_back();
             return;
         }
     }
     for (int i = 0; i < vertices[v].edgesIdTo.size(); ++i) {
         if (vertices[v].edgesIdTo[i] == id) {
             std::swap(vertices[v].edgesIdTo[i],vertices[v].edgesIdTo.back());
+            vertices[v].edgesIdTo.pop_back();
             return;
         }
     }
@@ -115,7 +132,7 @@ void Graph::CalculateForces() {
 
 	//odpychanie sie wierzcholkow
 	rep(i, 0, vertices.size()-1)
-		rep(j, i+1, vertices.size()-1) {
+		rep(j, 0, vertices.size()-1) {
 		float distance = getLenght(vertices[i].position, vertices[j].position);
 		float forceValue = RepulsionForce(distance);
 		sf::Vector2f forceVector_i_to_j = vertices[i].position - vertices[j].position;
@@ -129,8 +146,8 @@ void Graph::CalculateForces() {
 
 	//przyciaganie sie na krawedziach
 	rep(i, 0, vertices.size()-1)
-		rep(j, i+1, vertices.size()-1) {
-		bool czyJest = 0;
+		rep(j, 0, vertices.size()-1) {
+            bool czyJest = 0;
 		for (auto it : vertices[i].edgesIdTo) if (it == j) czyJest = 1;
         for (auto it : vertices[i].edgesIdFrom) if (it == j) czyJest = 1;
 		if (czyJest == 0) continue;
@@ -141,33 +158,51 @@ void Graph::CalculateForces() {
 		float angle1 = getAngleByCoordinates(vertices[i].position.x - vertices[j].position.x, vertices[i].position.y - vertices[j].position.y);
 		float angle2 = (angle1 + 180);
 		if (angle2 > 360) angle2 -= 180;
-		force[i] -= sf::Vector2f(forceValue * sin(angle1 / M_RAD), forceValue * cos(angle1 / M_RAD));
-		force[j] -= sf::Vector2f(forceValue * sin(angle2 / M_RAD), forceValue * cos(angle2 / M_RAD));
+		vertices[i].position -= sf::Vector2f(forceValue * sin(angle1 / M_RAD), forceValue * cos(angle1 / M_RAD));
+		vertices[i].position -= sf::Vector2f(forceValue * sin(angle2 / M_RAD), forceValue * cos(angle2 / M_RAD));
 	}
 }
 
 void Graph::ApplyForces() {
 	rep(i, 0, vertices.size()-1) {
-		sf::Vector2f delta = sf::Vector2f(vertices[i].x * 0.01, vertices[i].y * 0.01);
-		if (delta.x < 0.05) delta.x = 0;
-		if (delta.y < 0.05) delta.y = 0;
+		sf::Vector2f delta = sf::Vector2f(vertices[i].force.x * 0.01, vertices[i].force.y * 0.01);
+		if (fabs(delta.x) < 0.5) delta.x = 0;
+		if (fabs(delta.y) < 0.5) delta.y = 0;
 
 		vertices[i].position += delta;
-		vertices[i].circle.setPosition(grafika[i].circle.getPosition() + delta);
-		vertices[i].text.setPosition(grafika[i].text.getPosition() + delta);
+		vertices[i].circle.setPosition(vertices[i].circle.getPosition() + delta);
+		vertices[i].text1.setPosition(vertices[i].text1.getPosition() + delta);
 	}
 }
 
 float Graph::RepulsionForce(float distance) {
-	if (distance >= 100) return 0;
-	return ((distance - 100) * (distance - 100) / 1 + 50.f);
+	if (distance >= 100.f) return 0;
+	std::cout<<"rep: "<<(distance - 100.f) * (distance - 100.f) + 50.f<<std::endl;
+	return (distance - 100.f) * (distance - 100.f) + 50.f;
 }
 
 float Graph::AttractionForce(float distance) {
-	if (distance <= 100) return 0;
-	return ((distance - 100) * (distance - 100) / 5 + 50.f);
+	if (distance <= 100.f) return 0;
+	std::cout<<"attr: "<<(distance - 100.f) * (distance - 100.f) / 5.f + 50.f<<std::endl;
+	return (distance - 100.f) * (distance - 100.f) / 5.f + 50.f;
 }
 
-float Graph::GravityForce() {
-	return 100;
+float Graph::GravityForce(float distance) {
+	return 100.f;
+}
+void Graph::Draw(sf::RenderWindow& window){
+    sf::CircleShape shape(20.f,100);
+    shape.setFillColor(sf::Color::Green);
+    
+    for (Vertex v: vertices) {
+        shape.setPosition(sf::Vector2f(v.position.x, v.position.y));
+        window.draw(shape);
+    }
+    sf::VertexArray lines(sf::LinesStrip, 4);
+    
+    for (Edge edge: allEdges) {
+        lines[0].position = vertices[edge.idVertexFrom].position;
+        lines[1].position = vertices[edge.idVertexTo].position;
+        window.draw(lines);
+    }
 }
