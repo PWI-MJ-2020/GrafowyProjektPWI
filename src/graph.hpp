@@ -19,7 +19,7 @@ public:
     std::string text1, text2;
 	sf::Vector2f position;
 	sf::Vector2f force;
-    std::vector<int> edgesIdFrom;/////  1 2 3 4 .. 6 7 8 9 10
+    std::vector<int> edgesIdFrom;/////  1 2 3 4 5 6 7 8 9 10 11
     std::vector<int> edgesIdTo;
 
 	Vertex();
