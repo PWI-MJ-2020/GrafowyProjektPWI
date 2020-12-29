@@ -2,7 +2,11 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <iostream>
+#include <random>
 #include "graph.hpp"
+
+std::mt19937 rnd;
+int los(int mi,int mx) {return rnd()%(mx-mi+1)+mi;}
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1600, 800), "Projekt PWI");
@@ -17,7 +21,7 @@ int main()
     int n = 3, m = 0;
     {
         
-        for (int i = 0; i < n; ++i) G.AddVertex(Vertex(i));
+        for (int i = 0; i < n; ++i) G.AddVertex(sf::Vector2f(los(0,1500),los(0,700)));
         for (int j = 0; j < m; ++j) {
             int v,w;
             std::cin >> v >> w;

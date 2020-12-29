@@ -9,30 +9,28 @@
 typedef std::pair<int, int> pii;
 typedef std::vector<int> VI;
 typedef std::vector<std::pair<int, int> > VII;
-typedef std::pair<int,int> pii;
 
 class Vertex{
 public:
 	int id;///5
-    bool isDeleted;
-
-    std::string text1, text2;
+    std::string text1;
 	sf::Vector2f position;
 	sf::Vector2f force;
-    std::vector<int> edgesIdFrom;/////  1 2 3 4 5 6 7 8 9 10 11
+    std::vector<int> edgesIdFrom;/////  1 2 3 4 ..  7 8 9 10 11 12 13
     std::vector<int> edgesIdTo;
-
+	
 	Vertex();
-	Vertex(int);
+	Vertex(sf::Vector2f, int, std::string);
 };
 
 class Edge{
 public:
-    int id, idVertexFrom, idVertexTo, weight1, weight2;
+    int id, idVertexFrom, idVertexTo;
+    int weight1, weight2;
     bool isHighlighted, isDeleted;
 
     Edge();
-    Edge(int,int);
+    Edge(int,int,int,int);
 };	
 
 class Graph {
@@ -42,15 +40,16 @@ public:
     
     bool isDirected, isWeighted;
 
-	float GravityForce(int);
-	float RepulsionForce(int, int);
-	float AttractionForce(int, int);//w argumentach indeksy wierzcholkow
+	float GravityForce(float);
+	float RepulsionForce(float);
+	float AttractionForce(float);//w argumentach indeksy wierzcholkow
 
 	void CalculateForces();
 	void ApplyForces();
 
     void AddEdge(Edge);
-    void AddVertex(Vertex);
+    void AddVertex(sf::Vector2f);
+    void RemoveEdgeFromVertex(int,int);
 	void RemoveEdge(int);
     void RemoveVertex(int);
 
