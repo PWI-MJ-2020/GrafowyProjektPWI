@@ -125,7 +125,7 @@ void Graph::CalculateForces() {
 	rep(i, 0, vertices.size()-1) {
 		float distance = getLenght(sf::Vector2f(800, 400), vertices[i].position);
 		float forceValue = GravityForce(distance);
-		sf::Vector2f forceVector = sf::Vector2f(800, 400) - vertices[i].position;
+		//sf::Vector2f forceVector = sf::Vector2f(800, 400) - vertices[i].position;
 		float angle = getAngleByCoordinates(vertices[i].position.x - 800, vertices[i].position.y - 400);
 		vertices[i].force -= sf::Vector2f(forceValue * sin(angle / M_RAD), forceValue * cos(angle / M_RAD));//- a nie + bo grawitacja przyciaga FIZYKA 
 	}
@@ -135,8 +135,8 @@ void Graph::CalculateForces() {
 		rep(j, 0, vertices.size()-1) {
 		float distance = getLenght(vertices[i].position, vertices[j].position);
 		float forceValue = RepulsionForce(distance);
-		sf::Vector2f forceVector_i_to_j = vertices[i].position - vertices[j].position;
-		sf::Vector2f forceVector_j_to_i = vertices[j].position - vertices[i].position;
+		//sf::Vector2f forceVector_i_to_j = vertices[i].position - vertices[j].position;
+		//sf::Vector2f forceVector_j_to_i = vertices[j].position - vertices[i].position;
 		float angle1 = getAngleByCoordinates(vertices[i].position.x - vertices[j].position.x, vertices[i].position.y - vertices[j].position.y);
 		float angle2 = (angle1 + 180);
 		if (angle2 > 360) angle2 -= 180;
@@ -145,22 +145,21 @@ void Graph::CalculateForces() {
 	}
 
 	//przyciaganie sie na krawedziach
-	rep(i, 0, vertices.size()-1)
-		rep(j, 0, vertices.size()-1) {
-            bool czyJest = 0;
-		for (auto it : vertices[i].edgesIdTo) if (it == j) czyJest = 1;
-        for (auto it : vertices[i].edgesIdFrom) if (it == j) czyJest = 1;
-		if (czyJest == 0) continue;
+	/*for (auto edge : allEdges) {
+        int i = edge.idVertexFrom;
+        int j = edge.idVertexTo;
 		float distance = getLenght(vertices[i].position, vertices[j].position);
 		float forceValue = AttractionForce(distance);
-		sf::Vector2f forceVector_i_to_j = vertices[i].position - vertices[j].position;
-		sf::Vector2f forceVector_j_to_i = vertices[j].position - vertices[i].position;
+		//sf::Vector2f forceVector_i_to_j = vertices[i].position - vertices[j].position;
+		//sf::Vector2f forceVector_j_to_i = vertices[j].position - vertices[i].position;
 		float angle1 = getAngleByCoordinates(vertices[i].position.x - vertices[j].position.x, vertices[i].position.y - vertices[j].position.y);
 		float angle2 = (angle1 + 180);
 		if (angle2 > 360) angle2 -= 180;
-		vertices[i].position -= sf::Vector2f(forceValue * sin(angle1 / M_RAD), forceValue * cos(angle1 / M_RAD));
-		vertices[i].position -= sf::Vector2f(forceValue * sin(angle2 / M_RAD), forceValue * cos(angle2 / M_RAD));
-	}
+		vertices[i].force -= sf::Vector2f(forceValue * sin(angle1 / M_RAD), forceValue * cos(angle1 / M_RAD));
+		vertices[i].force -= sf::Vector2f(forceValue * sin(angle2 / M_RAD), forceValue * cos(angle2 / M_RAD));
+        //vertices[j].force += sf::Vector2f(forceValue * sin(angle1 / M_RAD), forceValue * cos(angle1 / M_RAD));
+		//vertices[j].force += sf::Vector2f(forceValue * sin(angle2 / M_RAD), forceValue * cos(angle2 / M_RAD));	
+    }*/
 }
 
 void Graph::ApplyForces() {
@@ -176,14 +175,14 @@ void Graph::ApplyForces() {
 }
 
 float Graph::RepulsionForce(float distance) {
-	if (distance >= 100.f) return 0;
-	std::cout<<"rep: "<<(distance - 100.f) * (distance - 100.f) + 50.f<<std::endl;
+	if (distance >= 100.f) return 0.f;
+	//std::cout<<"rep: "<<(distance - 100.f) * (distance - 100.f) + 50.f<<std::endl;
 	return (distance - 100.f) * (distance - 100.f) + 50.f;
 }
 
 float Graph::AttractionForce(float distance) {
-	if (distance <= 100.f) return 0;
-	std::cout<<"attr: "<<(distance - 100.f) * (distance - 100.f) / 5.f + 50.f<<std::endl;
+	if (distance <= 100.f) return 0.f;
+	std::cout<<"attr --- distance:  "<<distance<<"    force: "<<(distance - 100.f) * (distance - 100.f) / 5.f + 50.f<<std::endl;
 	return (distance - 100.f) * (distance - 100.f) / 5.f + 50.f;
 }
 
@@ -198,11 +197,13 @@ void Graph::Draw(sf::RenderWindow& window){
         shape.setPosition(sf::Vector2f(v.position.x, v.position.y));
         window.draw(shape);
     }
-    sf::VertexArray lines(sf::LinesStrip, 4);
-    
+    sf::VertexArray lines(sf::LinesStrip, 20);
+     
     for (Edge edge: allEdges) {
         lines[0].position = vertices[edge.idVertexFrom].position;
+        lines[0].color  = sf::Color::Red;
         lines[1].position = vertices[edge.idVertexTo].position;
+        lines[1].color  = sf::Color::Red;
         window.draw(lines);
     }
 }

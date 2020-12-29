@@ -5,7 +5,7 @@
 #include <random>
 #include "graph.hpp"
 
-std::mt19937 rnd;
+std::mt19937 rnd(21);
 int los(int mi,int mx) {return rnd()%(mx-mi+1)+mi;}
 int main()
 {
@@ -17,7 +17,7 @@ int main()
     if (!G.font.loadFromFile("Fonts/ABeeZee-Regular.ttf"))
 		throw("NIE MA CZCIONKI\n");
     
-    window.setFramerateLimit(20);
+    window.setFramerateLimit(100);
     int n = 3, m = 0;
     /*G.AddVertex(sf::Vector2f(1000,200));
     G.AddVertex(sf::Vector2f(100,800));*/
