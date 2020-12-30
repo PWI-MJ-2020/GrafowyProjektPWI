@@ -26,7 +26,7 @@ class Graph {
 public:
     std::vector<Vertex> vertices; //wszystkie wierzchołki
 	std::vector<Edge> allEdges; //wszystkie krawędzie
-    sf::Font font;
+    sf::Font * font;
     bool isDirected, isWeighted;
 
 	float CenterGravityForce(float);
@@ -44,7 +44,7 @@ public:
 
 
 	void Draw(sf::RenderWindow&);
-    Graph();
+    Graph( sf::Font *);
 };
 
 #endif

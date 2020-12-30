@@ -23,8 +23,9 @@ void Vertex::SetColor(sf::Color temp_color){
 
 void Graph::AddVertex(sf::Vector2f position){
     int newId = vertices.size();
-    sf::Text text1("",font);
-    Vertex vertexToAdd = Vertex(position, newId, font);
+    sf::Text text1("",*font);
+    //Text (const String &string, const Font &font, unsigned int characterSize=30)
+    Vertex vertexToAdd = Vertex(position, newId, *font);
     vertices.push_back(vertexToAdd);
 }
 
