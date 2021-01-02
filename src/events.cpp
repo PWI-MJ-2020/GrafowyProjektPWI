@@ -6,7 +6,7 @@
 #include "app.hpp"
 #include "graph.hpp"
 #include "graphics/button.hpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 void Application::HandleMouseButtonPressed(sf::Event &event) {
     for (Button &button : buttons) {
@@ -114,6 +114,9 @@ void Application::HandleMouseButtonPressed(sf::Event &event) {
             }
             break;
     }
+
+    std::cerr<<"\n\n\nlog po wykonaniu Pressed:"<<std::endl;
+    PrintGraphLog(G);
 }
 void Application::HandleMouseButtonReleased(sf::Event &event) {
     

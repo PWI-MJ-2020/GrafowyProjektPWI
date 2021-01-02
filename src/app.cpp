@@ -7,7 +7,7 @@
 #include <random>
 #include "graph.hpp"
 #include "app.hpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 std::mt19937 rnd2(1234);
 int los0(int mi,int mx) {return rnd2()%(mx-mi+1)+mi;}
@@ -88,29 +88,7 @@ void Application::Run() {
 
         sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
-       /*for (Vertex v:G.vertices) {
-            if (los0(1,200) <= 1) {
-                G.RemoveVertex(v.id);
-                for(Vertex v2: G.vertices) {
-                    std::cerr<<"V: "<<v2.id<<std::endl;
-                }
-                                    
-                std::cerr<<"edges:"<<std::endl;
-                for(Edge e2:G.allEdges) {
-                    std::cerr<<"E: "<<e2.id<<" "<<e2.idVertexFrom<<", "<<e2.idVertexTo<<std::endl;
-                }
-            }
-        }*/
-        
-        /*
-        for (Edge edge:G.allEdges) {
-            if (los0(1,200) <= 100) {
-                std::cerr<<"Usuwanie edge "<<edge.id<<" "<<edge.idVertexFrom<<" "<<edge.idVertexTo<<std::endl;
-                G.RemoveEdge(edge.id);
-            }
-        } 
-        */
-        //G.vertices [Vertex]
+      
 
         if(aktualnyStan == simulateForce)
         {

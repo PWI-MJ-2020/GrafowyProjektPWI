@@ -6,20 +6,10 @@
 #include <SFML/System.hpp>
 #include <vector>
 #include "vertex.hpp"
+#include "edge.hpp"
 typedef std::pair<int, int> pii;
 typedef std::vector<int> VI;
 typedef std::vector<std::pair<int, int> > VII;
-
-
-class Edge{
-public:
-    int id, idVertexFrom, idVertexTo;
-    int weight1, weight2;
-    bool isHighlighted;
-    sf::Text t1, t2;
-    Edge();
-    Edge(int,int,int,int,sf::Font*);
-};	
 
 class Graph {
 public:
