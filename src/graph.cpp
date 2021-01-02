@@ -96,7 +96,6 @@ void Graph::ApplyForces(int width,int height) {
 
 		v.position += delta;
         v.KeepInGraphArea(width, height);
-		v.circle.setPosition(v.circle.getPosition() + delta);
 		v.text1.setPosition( v.text1.getPosition()  + delta);
 	}
 }

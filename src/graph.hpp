@@ -7,9 +7,7 @@
 #include <vector>
 #include "vertex.hpp"
 #include "edge.hpp"
-typedef std::pair<int, int> pii;
-typedef std::vector<int> VI;
-typedef std::vector<std::pair<int, int> > VII;
+
 
 class Graph {
 public:

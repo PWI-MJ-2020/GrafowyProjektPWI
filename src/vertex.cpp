@@ -17,6 +17,10 @@ Vertex::Vertex(sf::Vector2f __position, int __id, sf::Font& font){
     text1.setFont(font);
     text1.setOrigin(sf::Vector2f(text1.getGlobalBounds().width/2,text1.getGlobalBounds().height/2));
     text1.setCharacterSize(20);
+    subText.setString("");
+    subText.setFont(font);
+    subText.setOrigin(sf::Vector2f(subText.getGlobalBounds().width/2,subText.getGlobalBounds().height/2));
+    subText.setCharacterSize(20);
     force = sf::Vector2f(0.f,0.f);
     color = sf::Color::Red;
     isBeingMoved = false;

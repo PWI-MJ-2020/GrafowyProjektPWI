@@ -12,7 +12,6 @@
 
 Edge::Edge(){
     idVertexFrom = idVertexTo = weight1 = weight2 = -1;
-    isHighlighted = false;
 }
 
 Edge::Edge(int v, int w, int w1, int w2,sf::Font *font) {
@@ -29,7 +28,6 @@ Edge::Edge(int v, int w, int w1, int w2,sf::Font *font) {
     t2.setCharacterSize(15);
     t1.setOrigin(sf::Vector2f(t1.getGlobalBounds().width/2,t1.getGlobalBounds().height/2));
     t2.setOrigin(sf::Vector2f(t2.getGlobalBounds().width/2,t2.getGlobalBounds().height/2));
-    isHighlighted = false;
 }
 
 void Edge::SetColor(sf::Color temp_color){
