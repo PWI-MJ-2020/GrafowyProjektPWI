@@ -11,6 +11,16 @@ VertexChange::VertexChange(int __id, int __data1, int __data2, sf::Color __color
     color = __color;
 };
 
+VertexChange::VertexChange(Vertex &v){
+    id = v.id;
+    data1 = v.data1;
+    data2 = v.data2;
+    color = v.color;
+};
+
+VertexChange::VertexChange(){}
+EdgeChange::EdgeChange(){}
+
 EdgeChange::EdgeChange(int __id, int __weight1, int __weight2, sf::Color __color){
     id = __id;
     weight1 = __weight1;
@@ -18,15 +28,33 @@ EdgeChange::EdgeChange(int __id, int __weight1, int __weight2, sf::Color __color
     color = __color;
 };
 
+EdgeChange::EdgeChange(Edge &e){
+    id = e.id;
+    weight1 = e.weight1;
+    weight2 = e.weight2;
+    color = e.color;
+}
+
 Step::Step(std::vector<VertexChange> __verticesChanges, std::vector<EdgeChange> __edgesChanges){
     verticesChanges = __verticesChanges;
     edgesChanges = __edgesChanges;
 }
 
 
+StepList& StepList::operator=(const StepList &__stepList) 
+{
+    G = __stepList.G;
+    forwardSteps  = std::vector<Step>(__stepList.forwardSteps); // kończy się na pustym (ew.)        
+    backwardSteps = std::vector<Step>(__stepList.backwardSteps); // zaczyna się od pustego           
+    currentStep = __stepList.currentStep;
+    maxStepEver= __stepList.maxStepEver; 
+
+    return *this;  
+} 
+
 StepList::StepList(Graph *ptr) {
     currentStep = -1;
-    maxStepEver = 0;
+    maxStepEver = -1;
     G = ptr;    
 }
 StepList::StepList() {}
@@ -84,7 +112,7 @@ void StepList::GoRight() {
     if (currentStep > maxStepEver) {
         maxStepEver = currentStep;
         AddBackwardsState(forwardSteps[currentStep]);
-    }        
+    }   
     for (VertexChange vc: forwardSteps[currentStep].verticesChanges){
         G->vertices[vc.id].data1 = vc.data1;
         G->vertices[vc.id].data2 = vc.data2;
@@ -95,8 +123,6 @@ void StepList::GoRight() {
         G->allEdges[ec.id].weight2 = ec.weight2;
         G->allEdges[ec.id].color = ec.color;
     }
-
-
 }
 
 void StepList::ClearStates() {
