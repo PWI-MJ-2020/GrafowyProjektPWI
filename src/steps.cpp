@@ -54,7 +54,7 @@ StepList& StepList::operator=(const StepList &__stepList)
 
 StepList::StepList(Graph *ptr) {
     currentStep = -1;
-    maxStepEver = -1;
+    maxStepEver = 0;
     G = ptr;    
 }
 StepList::StepList() {}
@@ -89,7 +89,7 @@ void StepList::AddBackwardsState(Step step){
     backwardSteps.push_back(step);
 }
 void StepList::GoLeft() {
-    if(currentStep == 0)
+    if(currentStep <= 0)
         return;
     currentStep--;
     for (VertexChange vc: backwardSteps[currentStep].verticesChanges){
@@ -106,7 +106,7 @@ void StepList::GoLeft() {
 }
 
 void StepList::GoRight() {
-    if(currentStep + 1 == forwardSteps.size()) //   cs = -1 0FStep cs = 0 1FStep cs=1 2FStep 3FStep 4FStep cs = 4;
+    if(currentStep + 1 >= forwardSteps.size()) //   cs = -1 0FStep cs = 0 1FStep cs=1 2FStep 3FStep 4FStep cs = 4;
         return;                                
     ++currentStep;
     if (currentStep > maxStepEver) {
@@ -126,6 +126,8 @@ void StepList::GoRight() {
 }
 
 void StepList::ClearStates() {
+    currentStep = -1;
+    maxStepEver = 0;
     forwardSteps.clear();
     backwardSteps.clear();
 }

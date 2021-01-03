@@ -41,12 +41,17 @@ void DFS(Graph *G,StepList *StepListPtr) {
     //ZEROWANIE
     //Graph
     Graph GKopia(G);
+    std::vector<VertexChange> initVerticesChanges;
+    std::vector<EdgeChange> initEdgesChanges;
     for (Vertex &v: GKopia.vertices) {
         v.data1 = 0;
         v.data2 = 0;
         v.color = sf::Color::Magenta;//dlaczego
+        VertexChange singleChange = VertexChange(v);
+        initVerticesChanges.push_back(singleChange);
     }
-    
+    Step initStep = Step(initVerticesChanges,initEdgesChanges);
+    StepListPtr->InitState(initStep);
     //StepList DFSStepList(&GKopia);
     //*DFSStepList = StepList(G);
     dfs(GKopia, StepListPtr,0);

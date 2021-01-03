@@ -46,6 +46,7 @@ void ButtonStepRight(Application    &app,Button &thisButton,sf::Event &event) {
 void ButtonStepLeft(Application     &app,Button &thisButton,sf::Event &event) {
     app.stepLista.GoLeft();}
 void ButtonRunAlgorithm(Application &app,Button &thisButton,sf::Event &event) {
+    app.stepLista.ClearStates();
     app.algorithms[0](&(app.G),&app.stepLista);
     app.aktualnyStan = algorithmR;}
 void SetTextToMousePosition(Application &app,Button &thisButton,sf::Event &event) {   
