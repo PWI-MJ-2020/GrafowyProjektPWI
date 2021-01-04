@@ -25,7 +25,11 @@ void Test(Application &app,Button &thisButton,sf::Event &event) {
     std::cout<<"test\n"<<std::endl;
     return;
 }
-
+void ChooseVertexInit(Application &app)
+{
+    app.aktualnyStan = chooseVertex;
+    app.chosenVertices.clear();
+}
 void ButtonRemoveVertex(Application &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = removeV;}
 void ButtonAddVertex(Application    &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = addV;}
 void ButtonRemoveEdge(Application   &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = removeE;}
@@ -35,20 +39,43 @@ void ButtonSimulate(Application     &app,Button &thisButton,sf::Event &event) {a
 void ButtonAlgorithm(Application    &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = algorithmC;}
 void ButtonReadFile(Application     &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = readFile;}
 void ButtonSaveFile(Application     &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = saveFile;}
-void ButtonReturn(Application       &app,Button &thisButton,sf::Event &event) {
+void ButtonReturnToGraphEdit(Application       &app,Button &thisButton,sf::Event &event) {
     app.aktualnyStan = simulateForce;
     app.holdingVertexId = -1;
     app.firstVertexId = -1;    
     app.secondVertexId = -1;}
-void ButtonReturnRun(Application    &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = algorithmC;}
+void ButtonReturnToAlgChoose(Application    &app,Button &thisButton,sf::Event &event) {
+    app.aktualnyStan = algorithmC;
+    for (Vertex &v: app.G.vertices)
+        v.color = sf::Color::Red;
+    for (Edge &e: app.G.allEdges)
+        e.color = sf::Color::Black;
+    }
 void ButtonStepRight(Application    &app,Button &thisButton,sf::Event &event) {
     app.stepLista.GoRight();}
 void ButtonStepLeft(Application     &app,Button &thisButton,sf::Event &event) {
     app.stepLista.GoLeft();}
-void ButtonRunAlgorithm(Application &app,Button &thisButton,sf::Event &event) {
+void ButtonRunDFS(Application       &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
-    app.algorithms[0](&(app.G),&app.stepLista);
-    app.aktualnyStan = algorithmR;}
+    ChooseVertexInit(app);
+    app.algorithmId = 0;
+    //app.algorithms[0](&(app.G),&app.stepLista);
+    //app.aktualnyStan = algorithmR;
+}
+void ButtonRunBFS(Application       &app,Button &thisButton,sf::Event &event) {
+    app.stepLista.ClearStates();
+    ChooseVertexInit(app);
+    app.algorithmId = 1;
+    //app.algorithms[1](&(app.G),&app.stepLista);
+    //app.aktualnyStan = algorithmR;
+}
+void ButtonRunColors(Application    &app,Button &thisButton,sf::Event &event) {
+    app.stepLista.ClearStates();
+    ChooseVertexInit(app);
+    app.algorithmId = 2;
+    //app.algorithms[2](&(app.G),&app.stepLista);
+    //app.aktualnyStan = algorithmR;
+}
 void SetTextToMousePosition(Application &app,Button &thisButton,sf::Event &event) {   
     thisButton.text.setString(std::to_string(event.mouseButton.x) + "x "+ std::to_string(event.mouseButton.y)+ "y");}
 
@@ -66,26 +93,35 @@ Application::Application()
     settings.antialiasingLevel = 0;
     
     
-    algorithms.push_back(DFS);
-    algorithms.push_back(ColorsAlgorithm);
+    
 
-    buttons.push_back(Button(50,24,195,45,"Dodaj wierzcholek",  &font,ButtonAddVertex));
-    buttons.push_back(Button(250,24,195,45,"Usun wierzcholek",  &font,ButtonRemoveVertex));
-    buttons.push_back(Button(450,24,145,45,"Dodaj krawedz",     &font,ButtonAddEdge));
-    buttons.push_back(Button(800,24,145,45,"Usun krawedz",      &font,ButtonRemoveEdge));
-    buttons.push_back(Button(900,24,145,45,"Symulacja sil",     &font,ButtonSimulate));
-    buttons.push_back(Button(1050,24,145,45,"Odczyt z pliku",   &font,ButtonReadFile));
-    buttons.push_back(Button(1200,24,145,45,"Zapis do pliku",   &font,ButtonSaveFile));
+    buttons.push_back(Button(50,24,195,45,"Dodaj wierzcholek",   &font,ButtonAddVertex));
+    buttons.push_back(Button(250,24,195,45,"Usun wierzcholek",   &font,ButtonRemoveVertex));
+    buttons.push_back(Button(450,24,145,45,"Dodaj krawedz",      &font,ButtonAddEdge));
+    buttons.push_back(Button(800,24,145,45,"Usun krawedz",       &font,ButtonRemoveEdge));
+    buttons.push_back(Button(900,24,145,45,"Symulacja sil",      &font,ButtonSimulate));
+    buttons.push_back(Button(1050,24,145,45,"Odczyt z pliku",    &font,ButtonReadFile));
+    buttons.push_back(Button(1200,24,145,45,"Zapis do pliku",    &font,ButtonSaveFile));
 
-    buttons.push_back(Button(1350,24,150,45,"Koordy",           &font,SetTextToMousePosition));
+    buttons.push_back(Button(1350,24,150,45,"Koordy",            &font,SetTextToMousePosition));
     buttons.push_back(Button(1350,24,150,45,"Przesun\nwierzcholek",&font,ButtonMoveVertex));
-    buttons.push_back(Button(1350,24,150,45,"Algorytm",&font,ButtonAlgorithm));
+    buttons.push_back(Button(1350,24,150,45,"Wybierz\nAlgorytm", &font,ButtonAlgorithm));
 
-    buttonsAlg.push_back(Button(50,24,150,45,"Run Algorytm",   &font,ButtonRunAlgorithm));
-    buttonsAlg.push_back(Button(190,24,150,45,"Powrot",        &font,ButtonReturn));
-    buttonsAlgR.push_back(Button(50,24,50,45,"->",             &font,ButtonStepRight));
-    buttonsAlgR.push_back(Button(120,24,50,45,"<-",            &font,ButtonStepLeft));
-    buttonsAlgR.push_back(Button(190,24,150,45,"Powrot",       &font,ButtonReturnRun));
+    algorithms.push_back(DFS);   
+    algorithms.push_back(BFS);   
+    buttonsAlg.push_back(Button(50,24,50,45,"DFS",     &font,ButtonRunDFS));
+    buttonsAlg.push_back(Button(50,24,50,45,"BFS",     &font,ButtonRunBFS));
+    
+    algorithms.push_back(ColorsAlgorithm);
+    buttonsAlg.push_back(Button(190,24,80,45,"Kolory",          &font,ButtonRunColors));
+    buttonsAlg.push_back(Button(190,24,150,45,"Powrot",          &font,ButtonReturnToGraphEdit));
+    
+
+
+    buttonsAlgR.push_back(Button(50,24,50,45,"->",               &font,ButtonStepRight));
+    buttonsAlgR.push_back(Button(120,24,50,45,"<-",              &font,ButtonStepLeft));
+    buttonsAlgR.push_back(Button(190,24,150,45,"Powrot",         &font,ButtonReturnToAlgChoose));
+    buttonsChooseVertex.push_back(Button(190,24,150,45,"Powrot", &font,ButtonReturnToAlgChoose));
 
     for (int i = 1; i< buttons.size();++i) {
         buttons[i].x = buttons[i-1].x + buttons[i-1].width + BUTTON_SPACING;
@@ -128,6 +164,14 @@ void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
             button.SetColor(sf::Color::Black);
         }
     }
+    for (Button &button : buttonsChooseVertex) {
+        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
+            button.SetColor(sf::Color::Blue);
+        }
+        else {
+            button.SetColor(sf::Color::Black);
+        }
+    }
 
 }
 
@@ -147,7 +191,7 @@ void Application::Run() {
         sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
         //stepLista.currentStep                
         //std::cerr<<"steplista: "<<stepLista.G->vertices.size()<<" <-> "<< stepLista.G <<"\n";
-        std::cerr<<(stepLista.G == sG);
+        //std::cerr<<(stepLista.G == sG);
         //assert((zeroV) || (    (stepLista.G->vertices[0].id >= 0 && stepLista.G->vertices[0].id <= 2) && stepLista.currentStep >= -1   ));
         
         if(aktualnyStan == simulateForce)
@@ -180,7 +224,7 @@ void Application::RenderGraphArea(){
     GraphArea.create(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT,settings);
     GraphArea.clear(sf::Color::Blue);
 
-    G.Draw(GraphArea);
+    G.Draw(GraphArea,aktualnyStan != algorithmR);
      
     GraphArea.display();
     sf::Sprite GraphAreaSprite;
@@ -210,6 +254,11 @@ void Application::RenderToolBar() {
         case algorithmR:
             for (int i=0; i<buttonsAlgR.size(); ++i) {
                 buttonsAlgR[i].draw(toolBar);
+            }
+            break;
+        case chooseVertex:
+            for (int i=0; i<buttonsChooseVertex.size(); ++i) {
+                buttonsChooseVertex[i].draw(toolBar);
             }
             break;
         default:

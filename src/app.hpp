@@ -18,6 +18,7 @@ enum stan {
         algorithmR,
         readFile,
         saveFile,
+        chooseVertex
 };
 
 class Application{
@@ -39,11 +40,14 @@ public:
     std::vector<Button> buttons;
     std::vector<Button> buttonsAlg;
     std::vector<Button> buttonsAlgR;
+    std::vector<Button> buttonsChooseVertex;
+    std::vector<int> chosenVertices;
     stan aktualnyStan;//wszystkie stany
     int holdingVertexId;
     int firstVertexId, secondVertexId;
+    int algorithmId;
 
-    std::vector<std::function<void(Graph *,StepList*)> > algorithms;
+    std::vector<std::function<void(Graph *,StepList*, std::vector<int> &)> > algorithms;
     void Run();
     void CheckPodswietlenie(sf::Vector2i);
     void Render();

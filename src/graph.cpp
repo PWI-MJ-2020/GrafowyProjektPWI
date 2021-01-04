@@ -92,7 +92,7 @@ void Graph::CalculateForces(const int width,const int height) {
 void Graph::ApplyForces(int width,int height) {
 //	rep(i, 0, vertices.size()-1) {
     for (Vertex &v :vertices) {
-        if (v.isBeingMoved) {
+        if (v.isBeingChosen) {
             v.KeepInGraphArea(width, height);
             continue;
         }
@@ -139,13 +139,15 @@ float Graph::CenterGravityForce(float distance) {
     return force;
 }
 
-void Graph::Draw(sf::RenderTarget& window){
+void Graph::Draw(sf::RenderTarget& window,bool editLook){
     for (Edge edge: allEdges) {        
         float distance = getLength(vertices[edge.idVertexFrom].position,vertices[edge.idVertexTo].position);
         float angle = GetAngleByPoints(vertices[edge.idVertexFrom].position,vertices[edge.idVertexTo].position);       
         sf::RectangleShape line(sf::Vector2f(distance, LINE_WIDTH));
+        
         line.setOrigin(sf::Vector2f(0, LINE_WIDTH/2));
-        line.setFillColor(sf::Color::Black);
+        if (editLook) edge.color = sf::Color::Black;
+        line.setFillColor(edge.color);
         line.setPosition(vertices[edge.idVertexFrom].position);
         line.setRotation(angle*(180/M_PI));
         edge.t1.setString(std::to_string(edge.id));//TA LINIJKA DO USUNIECIA
@@ -164,7 +166,16 @@ void Graph::Draw(sf::RenderTarget& window){
     for (Vertex v: vertices) {
         v.text1.setString(std::to_string(v.id));
         shape.setPosition(sf::Vector2f(v.position.x, v.position.y));
-        shape.setFillColor(v.color);
+        if (editLook) {
+            v.color = sf::Color::Red;            
+            if (v.isBeingChosen) {
+                shape.setFillColor(sf::Color::Yellow);
+            } else {
+                shape.setFillColor(sf::Color::Red);
+            }
+        }else {
+            shape.setFillColor(v.color);
+        }
         window.draw(shape);
         if(v.id < 10) v.text1.setPosition(sf::Vector2f(v.position.x, v.position.y- 3));
         else if(v.id < 100) v.text1.setPosition(sf::Vector2f(v.position.x + 3, v.position.y - 3));
