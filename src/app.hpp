@@ -13,12 +13,12 @@ enum stan {
         addV, removeV, 
         addE, removeE, 
         movingV,
-        simulateForce,
         algorithmC,
         algorithmR,
         readFile,
         saveFile,
-        chooseVertex
+        chooseVertex,
+        nothing
 };
 
 class Application{
@@ -46,6 +46,12 @@ public:
     int holdingVertexId;
     int firstVertexId, secondVertexId;
     int algorithmId;
+    bool simulateForces;
+
+    bool runningForward;
+    bool runningBack;
+    long double lastStep;
+    long double timeStep;
 
     std::vector<std::function<void(Graph *,StepList*, std::vector<int> &)> > algorithms;
     void Run();

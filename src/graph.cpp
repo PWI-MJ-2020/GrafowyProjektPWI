@@ -140,6 +140,8 @@ float Graph::CenterGravityForce(float distance) {
 }
 
 void Graph::Draw(sf::RenderTarget& window,bool editLook){
+
+
     for (Edge edge: allEdges) {        
         float distance = getLength(vertices[edge.idVertexFrom].position,vertices[edge.idVertexTo].position);
         float angle = GetAngleByPoints(vertices[edge.idVertexFrom].position,vertices[edge.idVertexTo].position);       
@@ -150,9 +152,26 @@ void Graph::Draw(sf::RenderTarget& window,bool editLook){
         line.setFillColor(edge.color);
         line.setPosition(vertices[edge.idVertexFrom].position);
         line.setRotation(angle*(180/M_PI));
-        edge.t1.setString(std::to_string(edge.id));//TA LINIJKA DO USUNIECIA
-
         window.draw(line);
+
+        
+        if (isDirected) {
+            sf::RectangleShape arrowLine1(sf::Vector2f(ARR_H, ARR_W));
+            sf::RectangleShape arrowLine2(sf::Vector2f(ARR_H, ARR_W));
+            arrowLine1.setOrigin(sf::Vector2f(0, ARR_W));
+            arrowLine2.setOrigin(sf::Vector2f(0, 0));
+            arrowLine1.setFillColor(edge.color);
+            arrowLine2.setFillColor(edge.color);
+            arrowLine1.setPosition(vertices[edge.idVertexFrom].position + sf::Vector2f(cos(angle)*V_RADIUS, sin(angle)*V_RADIUS)); // jaka konwencja from/to
+            arrowLine2.setPosition(vertices[edge.idVertexFrom].position + sf::Vector2f(cos(angle)*V_RADIUS, sin(angle)*V_RADIUS)); // jaka konwencja from/to
+
+            arrowLine1.setRotation(angle*(180/M_PI) + 45);
+            arrowLine2.setRotation(angle*(180/M_PI) - 45);
+            window.draw(arrowLine1);
+            window.draw(arrowLine2);
+        }
+
+        edge.t1.setString(std::to_string(edge.id));//TA LINIJKA DO USUNIECIA
         edge.t1.setPosition((vertices[edge.idVertexFrom].position.x + vertices[edge.idVertexTo].position.x)/2,(vertices[edge.idVertexFrom].position.y + vertices[edge.idVertexTo].position.y)/2);
         edge.t2.setPosition((vertices[edge.idVertexFrom].position.x + vertices[edge.idVertexTo].position.x)/2,(vertices[edge.idVertexFrom].position.y + vertices[edge.idVertexTo].position.y)/2+20);
         window.draw(edge.t1);
@@ -161,7 +180,7 @@ void Graph::Draw(sf::RenderTarget& window,bool editLook){
 
     sf::CircleShape shape(V_RADIUS,100);
     shape.setOrigin(sf::Vector2f(shape.getGlobalBounds().width/2,shape.getGlobalBounds().height/2));
-    shape.setFillColor(sf::Color::Blue);
+    //shape.setFillColor(sf::Color::Blue);
     
     for (Vertex v: vertices) {
         v.text1.setString(std::to_string(v.id));

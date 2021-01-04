@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <ctime>
 #include "graph.hpp"
 #include "app.hpp"
 #include "utils.hpp"
@@ -14,7 +15,7 @@
 #include <cassert>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
-bool zeroV = true;
+
 void *sG;
 //assert(zeroV || G->vertices.size() > 0);
 
@@ -35,16 +36,34 @@ void ButtonAddVertex(Application    &app,Button &thisButton,sf::Event &event) {a
 void ButtonRemoveEdge(Application   &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = removeE;}
 void ButtonAddEdge(Application      &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = addE;}
 void ButtonMoveVertex(Application   &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = movingV;}
-void ButtonSimulate(Application     &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = simulateForce;}
-void ButtonAlgorithm(Application    &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = algorithmC;}
+void ButtonSimulate(Application     &app,Button &thisButton,sf::Event &event) {app.simulateForces = !app.simulateForces;}
+void ButtonAlgorithm(Application    &app,Button &thisButton,sf::Event &event) {
+    app.simulateForces = false;
+    app.runningForward = false;
+    app.aktualnyStan = algorithmC;}
+void PlayAlgorithm(Application    &app,Button &thisButton,sf::Event &event) {
+    app.runningForward = true;
+    app.runningBack = false;
+    app.lastStep= clock();
+    app.lastStep /= CLOCKS_PER_SEC;}
+void PlayBackAlgorithm(Application    &app,Button &thisButton,sf::Event &event) {
+    app.runningBack = true;
+    app.runningForward = false;
+    app.lastStep= clock();
+    app.lastStep /= CLOCKS_PER_SEC;}
+void StopPlayingAlgorithm(Application    &app,Button &thisButton,sf::Event &event) {
+    app.runningForward = false;
+    app.runningBack = false;}
 void ButtonReadFile(Application     &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = readFile;}
 void ButtonSaveFile(Application     &app,Button &thisButton,sf::Event &event) {app.aktualnyStan = saveFile;}
 void ButtonReturnToGraphEdit(Application       &app,Button &thisButton,sf::Event &event) {
-    app.aktualnyStan = simulateForce;
+    app.aktualnyStan = nothing;
     app.holdingVertexId = -1;
     app.firstVertexId = -1;    
     app.secondVertexId = -1;}
 void ButtonReturnToAlgChoose(Application    &app,Button &thisButton,sf::Event &event) {
+    app.runningForward = false;
+    app.runningBack = false;
     app.aktualnyStan = algorithmC;
     for (Vertex &v: app.G.vertices)
         v.color = sf::Color::Red;
@@ -59,6 +78,7 @@ void ButtonRunDFS(Application       &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
     app.algorithmId = 0;
+    app.stepLista.GoRight();
     //app.algorithms[0](&(app.G),&app.stepLista);
     //app.aktualnyStan = algorithmR;
 }
@@ -66,6 +86,7 @@ void ButtonRunBFS(Application       &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
     app.algorithmId = 1;
+    app.stepLista.GoRight();
     //app.algorithms[1](&(app.G),&app.stepLista);
     //app.aktualnyStan = algorithmR;
 }
@@ -73,6 +94,7 @@ void ButtonRunColors(Application    &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
     app.algorithmId = 2;
+    app.stepLista.GoRight();
     //app.algorithms[2](&(app.G),&app.stepLista);
     //app.aktualnyStan = algorithmR;
 }
@@ -89,11 +111,14 @@ Application::Application()
     sG = &G;
     aktualnyStan    = addV;
     holdingVertexId = -1;
+    simulateForces = false;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 0;
     
-    
-    
+    runningForward = false;
+    runningBack = false;
+    timeStep = 0.01; //czas
+    lastStep = 0;
 
     buttons.push_back(Button(50,24,195,45,"Dodaj wierzcholek",   &font,ButtonAddVertex));
     buttons.push_back(Button(250,24,195,45,"Usun wierzcholek",   &font,ButtonRemoveVertex));
@@ -118,6 +143,9 @@ Application::Application()
     
 
 
+    buttonsAlgR.push_back(Button(50,24,50,45,"<",                &font,PlayBackAlgorithm));
+    buttonsAlgR.push_back(Button(50,24,50,45,"||",               &font,StopPlayingAlgorithm));
+    buttonsAlgR.push_back(Button(50,24,50,45,">",                &font,PlayAlgorithm));
     buttonsAlgR.push_back(Button(50,24,50,45,"->",               &font,ButtonStepRight));
     buttonsAlgR.push_back(Button(120,24,50,45,"<-",              &font,ButtonStepLeft));
     buttonsAlgR.push_back(Button(190,24,150,45,"Powrot",         &font,ButtonReturnToAlgChoose));
@@ -194,10 +222,30 @@ void Application::Run() {
         //std::cerr<<(stepLista.G == sG);
         //assert((zeroV) || (    (stepLista.G->vertices[0].id >= 0 && stepLista.G->vertices[0].id <= 2) && stepLista.currentStep >= -1   ));
         
-        if(aktualnyStan == simulateForce)
+        if(simulateForces)
         {
             G.CalculateForces(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT);//to wtedy i tlyko wtedy gdy aktualny stan na symulacje sily
             G.ApplyForces(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT);
+        } else {
+            for (Vertex &v: G.vertices) {
+                v.KeepInGraphArea(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT);
+            }
+        }
+        if( runningForward && aktualnyStan == algorithmR ){
+            long double tt= clock();
+            tt /= CLOCKS_PER_SEC;
+            if( tt >= lastStep + timeStep ){
+                lastStep = tt;
+                stepLista.GoRight();
+            }
+        }
+        if( runningBack && aktualnyStan == algorithmR ){
+            long double tt= clock();
+            tt /= CLOCKS_PER_SEC;
+            if( tt >= lastStep + timeStep ){
+                lastStep = tt;
+                stepLista.GoLeft();
+            }
         }
         CheckPodswietlenie(mousePosition);
         Render();
