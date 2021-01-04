@@ -21,6 +21,7 @@ void BFS(Graph *G,StepList *StepListPtr, std::vector<int> &chosenV) {
         VertexChange singleChange = VertexChange(v);
         initVerticesChanges.push_back(singleChange);
     }
+
     std::queue<int> Q;
     Q.push(chosenV[0]);
     GKopia.vertices[chosenV[0]].data1 = 1;
@@ -28,6 +29,8 @@ void BFS(Graph *G,StepList *StepListPtr, std::vector<int> &chosenV) {
     StepListPtr->InitState(initStep);
 
     std::vector<int> prvEdgesId;
+    int prvVId = -1;
+    int stepCounter = 0;
     while (!Q.empty()) {
         int v = Q.front();
         Q.pop();                
@@ -35,16 +38,27 @@ void BFS(Graph *G,StepList *StepListPtr, std::vector<int> &chosenV) {
         GKopia.vertices[v].color = sf::Color::Red;
         std::vector<VertexChange> nVerticesChanges;
         std::vector<EdgeChange> nEdgesChanges;
-        VertexChange nChange = VertexChange(GKopia.vertices[v]);
-        nVerticesChanges.push_back(nChange);
-        Step nStep = Step(nVerticesChanges, nEdgesChanges);
         while (prvEdgesId.size()) {
             GKopia.allEdges[prvEdgesId.back()].color = sf::Color::Black;
             nEdgesChanges.push_back(GKopia.allEdges[prvEdgesId.back()]);
             prvEdgesId.pop_back();
         }
+
+        if (prvVId != -1){
+            GKopia.vertices[prvVId].color = sf::Color(0,100,0);
+            nVerticesChanges.push_back(VertexChange(GKopia.vertices[prvVId]));   
+        }
+        Step nStep = Step(nVerticesChanges, nEdgesChanges);
+        StepListPtr->AddState(nStep);
+        prvVId = v;
+        nVerticesChanges.clear();
+        nEdgesChanges.clear();
+
+        nVerticesChanges.push_back(VertexChange(GKopia.vertices[v]));
+        nStep = Step(nVerticesChanges, nEdgesChanges);
         StepListPtr->AddState(nStep);
         nVerticesChanges.clear();
+        
         if(GKopia.isDirected == 0) {
             for(int id: GKopia.vertices[v].edgesIdFrom) {
                 if(GKopia.vertices[GKopia.allEdges[id].idVertexFrom].data1 == 0)   {
@@ -80,4 +94,13 @@ void BFS(Graph *G,StepList *StepListPtr, std::vector<int> &chosenV) {
         if(nVerticesChanges.size()) StepListPtr->AddState(nStep2);
     }
 
+    // Dot. ostatniego kroku (wierzchołka)
+    std::vector<VertexChange> nLVerticesChanges;
+    std::vector<EdgeChange> nLEdgesChanges;
+    if (prvVId != -1){
+        GKopia.vertices[prvVId].color = sf::Color(0,100,0);
+        nLVerticesChanges.push_back(VertexChange(GKopia.vertices[prvVId]));   
+    }
+    Step nStep = Step(nLVerticesChanges, nLEdgesChanges);
+    StepListPtr->AddState(nStep);
 }
