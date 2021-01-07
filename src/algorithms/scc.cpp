@@ -26,13 +26,11 @@ std::vector<int> order;
 
 void dfs_reku1(Graph &G, StepList* DFSStepList, int v) {
     G.vertices[v].data1   = 1;//visited
-    G.vertices[v].data2   = idx++;//postorder
-    //G.vertices[v].subText.setString("vis");
     G.vertices[v].color = sf::Color::Yellow;
+    
     
     std::vector<VertexChange> firstVerticesChanges;
     std::vector<EdgeChange> firstEdgesChanges; // docelowo pusty
-
     VertexChange onlyChange = VertexChange(G.vertices[v]);
     firstVerticesChanges.push_back(onlyChange);
     Step firstStep = Step(firstVerticesChanges,firstEdgesChanges);
@@ -41,6 +39,15 @@ void dfs_reku1(Graph &G, StepList* DFSStepList, int v) {
     for(auto id: G.vertices[v].edgesIdTo) 
         if(G.vertices[G.allEdges[id].idVertexTo].data1 == 0) 
             dfs_reku1(G, DFSStepList, G.allEdges[id].idVertexTo);
+    
+    G.vertices[v].data2   = idx++;//postorder
+    G.vertices[v].color   = sf::Color::Magenta;
+    VertexChange onlyChange2 = VertexChange(G.vertices[v]);
+    std::vector<VertexChange> secondVerticesChanges;
+    std::vector<EdgeChange> secondEdgesChanges; // docelowo pusty
+    secondVerticesChanges.push_back(onlyChange2);
+    Step secondStep = Step(secondVerticesChanges,secondEdgesChanges);
+    DFSStepList->AddState(secondStep);
     order.push_back(v);
 }
 
@@ -60,13 +67,15 @@ void dfs_reku2(Graph &G, StepList* DFSStepList, int v) {
     DFSStepList->AddState(firstStep);
     ////////////////////////
     for(auto id: G.vertices[v].edgesIdFrom) 
-        if(G.vertices[G.allEdges[id].idVertexTo].data1 == 0) 
-            dfs_reku2(G, DFSStepList, G.allEdges[id].idVertexTo);
+        if(G.vertices[G.allEdges[id].idVertexFrom].data1 == 0) 
+            dfs_reku2(G, DFSStepList, G.allEdges[id].idVertexFrom);
 }
 
 void SCC(Graph *G,StepList *StepListPtr, std::vector<int>  &chosenV) {  
     //ZEROWANIE
     //Graph
+    nr = 1;
+    idx = 0; 
     Graph GKopia(G);
     std::vector<VertexChange> initVerticesChanges;
     std::vector<EdgeChange> initEdgesChanges;

@@ -302,12 +302,12 @@ void Graph::Draw(sf::RenderTarget& window,bool editLook){
     shape2.setOrigin(sf::Vector2f(shape2.getGlobalBounds().width/2,shape2.getGlobalBounds().height/2));
     for (Edge edge: allEdges) {
         shape2.setPosition(edge.midEFrom.position);
-        window.draw(shape2);
+        //window.draw(shape2);
     }
-    shape2.setFillColor(sf::Color(0,0,200,200));
+    shape2.setFillColor(sf::Color(0,200,0,200));
     for (Edge edge: allEdges) {
         shape2.setPosition(edge.midETo.position);
-        window.draw(shape2);
+        //window.draw(shape2);
     }
 
 

@@ -10,31 +10,34 @@
 #include "../utils.hpp"
 
 void dfs_reku(Graph &G, StepList* DFSStepList, int v) {
-    G.vertices[v].data1   = 1;
-    G.vertices[v].subText.setString("vis");
-    G.vertices[v].color = sf::Color::Yellow;
-    std::cerr<<"v: "<<v<<"\n";
+    G.vertices[v].data1 = 1;
+    G.vertices[v].color = sf::Color(41, 230, 230);
+    //std::cerr<<"v: "<<v<<"\n";
     ///////////////////////
-    std::vector<VertexChange> firstVerticesChanges;
-    std::vector<EdgeChange> firstEdgesChanges; // docelowo pusty
+    std::vector<VertexChange> verticesChanges;
+    std::vector<EdgeChange> edgesChanges; // docelowo pusty
 
     VertexChange onlyChange = VertexChange(G.vertices[v]);
-    firstVerticesChanges.push_back(onlyChange);
-    Step firstStep = Step(firstVerticesChanges,firstEdgesChanges);
-    DFSStepList->AddState(firstStep);
+    verticesChanges.push_back(onlyChange);
+    DFSStepList->AddState(Step(verticesChanges,edgesChanges));
+    verticesChanges.clear();
+    edgesChanges.clear();
     ////////////////////////
-    if(G.isDirected == 0) 
-        for(auto id: G.vertices[v].edgesIdFrom) 
-            if(G.vertices[G.allEdges[id].idVertexFrom].data1 == 0) 
+    if(G.isDirected == 0) {
+        for(auto id: G.vertices[v].edgesIdFrom){ 
+            if(G.vertices[G.allEdges[id].idVertexFrom].data1 == 0){ 
                 dfs_reku(G, DFSStepList, G.allEdges[id].idVertexFrom);
-            
 
+            }
+        }
+    }
     for(auto id: G.vertices[v].edgesIdTo) 
         if(G.vertices[G.allEdges[id].idVertexTo].data1 == 0) 
             dfs_reku(G, DFSStepList, G.allEdges[id].idVertexTo);
-    
-    //G->vertices[v].data1   = 1;
-    //G->vertices[v].subText = "Prerobiony";
+
+    G.vertices[v].color = sf::Color(36, 158, 115);
+    verticesChanges.push_back(VertexChange(G.vertices[v]));
+    DFSStepList->AddState(Step(verticesChanges,edgesChanges));
 }
 
 void DFS(Graph *G,StepList *StepListPtr, std::vector<int>  &chosenV) {  
@@ -52,17 +55,10 @@ void DFS(Graph *G,StepList *StepListPtr, std::vector<int>  &chosenV) {
     }
     Step initStep = Step(initVerticesChanges,initEdgesChanges);
     StepListPtr->InitState(initStep);
-    //StepList DFSStepList(&GKopia);
-    //*DFSStepList = StepList(G);
+ 
     dfs_reku(GKopia, StepListPtr,chosenV[0]);
-    //return DFSStepList;
+
 }
 
-/*
-    vector<FunkcjaAlgorytmy> algorithms;
-    listaKrokow = ColorsAlgorithms(nasz_graf_z_ekranu)
-
-
-*/
 
 

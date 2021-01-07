@@ -4,6 +4,8 @@
 #include <iostream>
 #include <random>
 #include <climits>
+#include <algorithm>
+
 #include "app.hpp"
 #include "graph.hpp"
 #include "graphics/button.hpp"

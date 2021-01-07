@@ -121,12 +121,21 @@ void ButtonRunSCC(Application       &app,Button &thisButton,sf::Event &event) {
     app.algorithmId = 3;
     app.stepLista.GoRight();
 }
-void ButtonRunColors(Application    &app,Button &thisButton,sf::Event &event) {
+
+void ButtonRunPostorder(Application       &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
     app.algorithmId = 4;
     app.stepLista.GoRight();
 }
+
+void ButtonRunColors(Application    &app,Button &thisButton,sf::Event &event) {
+    app.stepLista.ClearStates();
+    ChooseVertexInit(app);
+    app.algorithmId = 5;
+    app.stepLista.GoRight();
+}
+void ButtonNothing(Application &app,Button &thisButton,sf::Event &event){}
 //void SetTextToMousePosition(Application &app,Button &thisButton,sf::Event &event) {   
 //    thisButton.text.setString(std::to_string(event.mouseButton.x) + "x "+ std::to_string(event.mouseButton.y)+ "y");}
 void ButtonIncreaseAlgSpeed(Application    &app,Button &thisButton,sf::Event &event) {
@@ -193,6 +202,8 @@ Application::Application()
     algorithms.push_back(SCC);   
     buttonsAlg.push_back(Button(50,24,50,45,"SCC", &font,ButtonRunSCC));
 
+    algorithms.push_back(POSTORDER);   
+    buttonsAlg.push_back(Button(50,24,50,45,"POSTORDER", &font,ButtonRunPostorder));
 
     algorithms.push_back(ColorsAlgorithm);
     buttonsAlg.push_back(Button(190,24,80,45,"Kolory",&font,ButtonRunColors));
@@ -206,10 +217,12 @@ Application::Application()
     buttonsAlgR.push_back(Button(240,24,50,45,"->",              &font,ButtonStepRight));
     buttonsAlgR.push_back(Button(310,24,50,45,"<-",              &font,ButtonStepLeft));
     buttonsAlgR.push_back(Button(380,24,150,45, textReturn,      &font,ButtonReturnToAlgChoose));
-
     buttonsAlgR.push_back(Button(550,24,50,45,"-",               &font,ButtonDecreaseAlgSpeed));
-    textBoxAlgR.push_back(TextBox(620,24,50,45,"x1",             &font));
+    //textBoxAlgR.push_back(TextBox(620,24,50,45,"x1",             &font));
     buttonsAlgR.push_back(Button(690,24,50,45,"+",               &font,ButtonIncreaseAlgSpeed));
+    buttonsAlgR.push_back(Button(690,24,60,45,"",                &font,ButtonNothing));
+    buttonsAlgR[8].ifThisIsTextBox = true;
+
     buttonsChooseVertex.push_back(Button(190,24,150,45, textReturn, &font,ButtonReturnToAlgChoose));
 
     for (int i = 1; i< buttons.size();++i) {
@@ -220,12 +233,15 @@ Application::Application()
         buttonsAlg[i].x = buttonsAlg[i-1].x + buttonsAlg[i-1].width + BUTTON_SPACING;
         buttonsAlg[i].Relocate();
     }
+
     window.create(sf::VideoMode(1920, 1080), "Projekt PWI",sf::Style::Default,settings);
     window.setFramerateLimit(100);
 }
 
 void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
     for (Button &button : buttons) {
+        if( button.ifThisIsTextBox )
+            continue;
         if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
             button.SetColor(sf::Color::Blue);
         }
@@ -234,6 +250,8 @@ void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
         }
     }
     for (Button &button : buttonsAlg) {
+        if( button.ifThisIsTextBox )
+            continue;
         if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
             button.SetColor(sf::Color::Blue);
         }
@@ -242,6 +260,8 @@ void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
         }
     }
     for (Button &button : buttonsAlgR) {
+        if( button.ifThisIsTextBox )
+            continue;
         if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
             button.SetColor(sf::Color::Blue);
         }
@@ -250,6 +270,8 @@ void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
         }
     }
     for (Button &button : buttonsChooseVertex) {
+        if( button.ifThisIsTextBox )
+            continue;
         if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
             button.SetColor(sf::Color::Blue);
         }
@@ -260,7 +282,7 @@ void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
 
 }
 
-void Application::Run() {
+void Application::Run() {    
     for(Vertex v2: G.vertices) {
         std::cerr<<"V: "<<v2.id<<std::endl;
     }    
@@ -351,18 +373,21 @@ int TotalLength( std::vector<Button>* buttonsv )
 
 void SetPositionsForButtons( std::vector<Button>* buttonsv, Application* app )
 {
+    long double scale, xdb, ydb, btspdb, hdb;
+    int l;
     if( TotalLength(buttonsv) <= app->window.getSize().x ){
         (*buttonsv)[0].x = BUTTON_SPACING;
+        (*buttonsv)[0].scale = 1;
         (*buttonsv)[0].y = 25;
-        (*buttonsv)[0].Relocate();
         for (int i = 1; i< buttonsv->size();++i) {
             (*buttonsv)[i].x = (*buttonsv)[i-1].x + (*buttonsv)[i-1].width + BUTTON_SPACING;
             (*buttonsv)[i].y = 25;
-            (*buttonsv)[i].Relocate();
+            (*buttonsv)[i].scale = 1;
         }
     }
     else{
-        int i = 0, l = BUTTON_SPACING;
+        int i = 0;
+        l = BUTTON_SPACING;
         for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
             l += (*buttonsv)[i].width + BUTTON_SPACING;
             i++;
@@ -381,7 +406,7 @@ void SetPositionsForButtons( std::vector<Button>* buttonsv, Application* app )
             for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
                 (*buttonsv)[i].x = l;
                 (*buttonsv)[i].y = 2;
-                (*buttonsv)[i].Relocate();
+                (*buttonsv)[i].scale = 1;
                 l += (*buttonsv)[i].width + BUTTON_SPACING;
                 i++;
             }
@@ -392,9 +417,59 @@ void SetPositionsForButtons( std::vector<Button>* buttonsv, Application* app )
             for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
                 (*buttonsv)[i].x = l;
                 (*buttonsv)[i].y = 52;
-                (*buttonsv)[i].Relocate();
+                (*buttonsv)[i].scale = 1;
                 l += (*buttonsv)[i].width + BUTTON_SPACING;
                 i++;
+            }
+        }else{
+            for( int k = 3; k < 100; k++ ){
+                i = 0;
+                scale = 2;
+                scale /= k;
+                hdb = BUTTON_HEIGHT;
+                hdb *= scale;
+                btspdb = BUTTON_SPACING;
+                btspdb *= scale;
+                for( int j = 0; j < k; j++ )
+                {
+                    l = btspdb;
+                    for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+                        xdb = (*buttonsv)[i].width;
+                        xdb *= scale;
+                        l += xdb + btspdb;
+                        i++;
+                    }
+                    if( l > app->window.getSize().x ){
+                        i--;
+                        xdb = (*buttonsv)[i].width;
+                        xdb *= scale;
+                        l -= xdb + btspdb;
+                    }
+                }
+                if( i == buttonsv->size() ){
+                    i = 0;
+                    for( int j = 0; j < k; j++ )
+                    {
+                        l = btspdb;
+                        ydb = 2 + ( hdb + 2.5 ) * j;
+                        for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+                            (*buttonsv)[i].x = l;
+                            (*buttonsv)[i].y = ydb;
+                            (*buttonsv)[i].scale = scale;
+                            xdb = (*buttonsv)[i].width;
+                            xdb *= scale;
+                            l += xdb + btspdb;
+                            i++;
+                        }
+                        if( l > app->window.getSize().x ){
+                            i--;
+                            xdb = (*buttonsv)[i].width;
+                            xdb *= scale;
+                            l -= xdb + btspdb;
+                        }
+                    }
+                    break;
+                }
             }
         }
     }
@@ -413,8 +488,6 @@ void Application::RenderToolBar() {
     toolBar.draw(shape);
     std::stringstream stringStream;
     std::string stringSpeed;
-    long double scale;
-    int totalLength = 0;
     switch( aktualnyStan )
     {
         case algorithmC:
@@ -424,17 +497,17 @@ void Application::RenderToolBar() {
             }
             break;
         case algorithmR:
+            stringStream << std::fixed << std::setprecision(3) << std::round(timeStep * 64000)/1000;
+            stringSpeed = stringStream.str();
+            buttonsAlgR[8].text.setString(stringSpeed);
             SetPositionsForButtons( &buttonsAlgR, this );
             for (int i=0; i<buttonsAlgR.size(); ++i) {
                 buttonsAlgR[i].draw(toolBar);
             }
-            
-            stringStream << std::fixed << std::setprecision(3) << std::round(timeStep * 64000)/1000;
-            stringSpeed = stringStream.str();
-            textBoxAlgR[0].text.setString(stringSpeed);
+            /*
             for (TextBox &tb :textBoxAlgR) {
-                tb.draw(toolBar);
-            }
+                tb.Draw(toolBar);
+            }*/
             break;
         case chooseVertex:
             SetPositionsForButtons( &buttonsChooseVertex, this );
