@@ -24,6 +24,17 @@ int idx = 0;
 int nr = 1;
 std::vector<int> order;
 
+std::map<int,sf::Color> mapa={
+    {0,sf::Color::Black},
+    {1,sf::Color::Magenta},
+    {2,sf::Color::Red},
+    {3,sf::Color((uint)204,(uint)102,(uint)0,(uint)255)},//ciemny braz
+    {4,sf::Color((uint)153,(uint)0,(uint)0,(uint)255)},//bordo
+    {5,sf::Color((uint)0,(uint)102,(uint)102,(uint)255)}//taki zielony ale ciemny
+};
+int num = mapa.size();
+int cdx;
+
 void dfs_reku1(Graph &G, StepList* DFSStepList, int v) {
     G.vertices[v].data1   = 1;//visited
     G.vertices[v].color = sf::Color::Yellow;
@@ -41,7 +52,7 @@ void dfs_reku1(Graph &G, StepList* DFSStepList, int v) {
             dfs_reku1(G, DFSStepList, G.allEdges[id].idVertexTo);
     
     G.vertices[v].data2   = idx++;//postorder
-    G.vertices[v].color   = sf::Color::Magenta;
+    G.vertices[v].color   = sf::Color::Cyan;
     VertexChange onlyChange2 = VertexChange(G.vertices[v]);
     std::vector<VertexChange> secondVerticesChanges;
     std::vector<EdgeChange> secondEdgesChanges; // docelowo pusty
@@ -56,8 +67,8 @@ void dfs_reku2(Graph &G, StepList* DFSStepList, int v) {
     G.vertices[v].data2   = nr;//nr skladowej
     //G.vertices[v].subText.setString("vis");
 
-    G.vertices[v].color = sf::Color::Yellow;//kolejnny kolor DO POPRAWKI
-
+    //G.vertices[v].color = sf::Color::Yellow;//kolejnny kolor DO POPRAWKI
+    G.vertices[v].color = mapa[cdx];
     std::vector<VertexChange> firstVerticesChanges;
     std::vector<EdgeChange> firstEdgesChanges; // docelowo pusty
 
@@ -76,6 +87,7 @@ void SCC(Graph *G,StepList *StepListPtr, std::vector<int>  &chosenV) {
     //Graph
     nr = 1;
     idx = 0; 
+    cdx = 0;
     Graph GKopia(G);
     std::vector<VertexChange> initVerticesChanges;
     std::vector<EdgeChange> initEdgesChanges;
@@ -107,6 +119,7 @@ void SCC(Graph *G,StepList *StepListPtr, std::vector<int>  &chosenV) {
         if(GKopia.vertices[v].data1 == 0) {
             dfs_reku2(GKopia, StepListPtr,v);
             nr++;
+            cdx = (cdx + 1) % num;
         }
     }
     //return DFSStepList;
