@@ -16,7 +16,6 @@
 #include <cassert>
 #define assertm(exp, msg) assert(((void)msg, exp))
 void *sG;
-//assert(zeroV || G->vertices.size() > 0);
 
 std::mt19937 rnd2(1234);
 int los0(int mi,int mx) {return rnd2()%(mx-mi+1)+mi;}
@@ -70,11 +69,12 @@ void StopPlayingAlgorithm(Application    &app,Button &thisButton,sf::Event &even
     app.runningBack = false; 
    }
 void ButtonReadFile(Application     &app,Button &thisButton,sf::Event &event) {
+    app.textEntered.clear();
     app.aktualnyStan = readFile;
     app.textEntered.clear(); 
-   
     }
 void ButtonSaveFile(Application     &app,Button &thisButton,sf::Event &event) {
+    app.textEntered.clear();
     app.aktualnyStan = saveFile;
     app.textEntered.clear(); 
     }
@@ -92,11 +92,15 @@ void ButtonReturnToAlgChoose(Application    &app,Button &thisButton,sf::Event &e
         v.color = sf::Color::Red;
     for (Edge &e: app.G.allEdges)
         e.color = sf::Color::Black;
-    } 
+} 
 void ButtonStepRight(Application    &app,Button &thisButton,sf::Event &event) {
-    app.stepLista.GoRight();}
+    app.stepLista.GoRight();
+    app.runningForward = false;
+    app.runningBack = false;}
 void ButtonStepLeft(Application     &app,Button &thisButton,sf::Event &event) {
-    app.stepLista.GoLeft();}
+    app.stepLista.GoLeft();
+    app.runningForward = false;
+    app.runningBack = false;}
 void ButtonRunDFS(Application       &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
@@ -109,7 +113,7 @@ void ButtonRunBFS(Application       &app,Button &thisButton,sf::Event &event) {
     app.algorithmId = 1;
     app.stepLista.GoRight();
 }
-void ButtonRunDIJKSTRA(Application       &app,Button &thisButton,sf::Event &event) {
+void ButtonRunDIJKSTRA(Application  &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
     app.algorithmId = 2;
@@ -117,8 +121,9 @@ void ButtonRunDIJKSTRA(Application       &app,Button &thisButton,sf::Event &even
 }
 void ButtonRunSCC(Application       &app,Button &thisButton,sf::Event &event) {
     app.stepLista.ClearStates();
-    ChooseVertexInit(app);
+    app.aktualnyStan = algorithmR;
     app.algorithmId = 3;
+    app.algorithms[app.algorithmId](&(app.G),&(app.stepLista),app.chosenVertices);
     app.stepLista.GoRight();
 }
 
@@ -129,12 +134,25 @@ void ButtonRunPostorder(Application       &app,Button &thisButton,sf::Event &eve
     app.stepLista.GoRight();
 }
 
-void ButtonRunColors(Application    &app,Button &thisButton,sf::Event &event) {
+void ButtonRunMST(Application       &app,Button &thisButton,sf::Event &event) {
+    std::cerr<<"NACISKAM BUTTON MST!!!"<<"\n";
     app.stepLista.ClearStates();
     ChooseVertexInit(app);
     app.algorithmId = 5;
     app.stepLista.GoRight();
 }
+
+void ButtonRunColors(Application    &app,Button &thisButton,sf::Event &event) {
+    app.stepLista.ClearStates();
+    ChooseVertexInit(app);
+    app.algorithmId = 6;
+    app.stepLista.GoRight();
+}
+
+void ButtonGraphDirected(Application    &app,Button &thisButton,sf::Event &event) {
+    app.G.isDirected = !app.G.isDirected;
+}
+
 void ButtonNothing(Application &app,Button &thisButton,sf::Event &event){}
 //void SetTextToMousePosition(Application &app,Button &thisButton,sf::Event &event) {   
 //    thisButton.text.setString(std::to_string(event.mouseButton.x) + "x "+ std::to_string(event.mouseButton.y)+ "y");}
@@ -149,8 +167,6 @@ Application::Application()
     if (!font.loadFromFile("Fonts/OpenSans-Regular.ttf"))
 		throw("NIE MA CZCIONKI\n");
    
-    
-        
     G = Graph(&font);
     stepLista = StepList(&G);
     sG = &G;
@@ -188,6 +204,7 @@ Application::Application()
     buttons.push_back(Button(1200,24,145,45,"Zapis do pliku",    &font,ButtonSaveFile));
     //buttons.push_back(Button(1350,24,150,45,"Koordy",            &font,SetTextToMousePosition));
     buttons.push_back(Button(1350,24,150,45,textMoveVertex,      &font,ButtonMoveVertex));
+    buttons.push_back(Button(1350,24,150,45,"Graf skierowany",      &font,ButtonGraphDirected));
     buttons.push_back(Button(1350,24,150,45,"Wybierz\nAlgorytm", &font,ButtonAlgorithm));
 
     algorithms.push_back(DFS);   
@@ -202,8 +219,13 @@ Application::Application()
     algorithms.push_back(SCC);   
     buttonsAlg.push_back(Button(50,24,50,45,"SCC", &font,ButtonRunSCC));
 
+
     algorithms.push_back(POSTORDER);   
     buttonsAlg.push_back(Button(50,24,50,45,"POSTORDER", &font,ButtonRunPostorder));
+
+    algorithms.push_back(MST);   
+    buttonsAlg.push_back(Button(50,24,50,45,"MST", &font,ButtonRunMST));
+
 
     algorithms.push_back(ColorsAlgorithm);
     buttonsAlg.push_back(Button(190,24,80,45,"Kolory",&font,ButtonRunColors));
@@ -240,55 +262,31 @@ Application::Application()
 
 void Application::CheckPodswietlenie(sf::Vector2i mousePosition) {
     for (Button &button : buttons) {
-        if( button.ifThisIsTextBox )
-            continue;
-        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
-            button.SetColor(sf::Color::Blue);
-        }
-        else {
-            button.SetColor(sf::Color::Black);
-        }
+        if(button.ifThisIsTextBox) continue;
+        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {button.SetColor(sf::Color::Blue);}
+        else {button.SetColor(sf::Color::Black);}
     }
     for (Button &button : buttonsAlg) {
-        if( button.ifThisIsTextBox )
-            continue;
-        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
-            button.SetColor(sf::Color::Blue);
-        }
-        else {
-            button.SetColor(sf::Color::Black);
-        }
+        if(button.ifThisIsTextBox) continue;
+        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {button.SetColor(sf::Color::Blue);}
+        else {button.SetColor(sf::Color::Black);}
     }
     for (Button &button : buttonsAlgR) {
-        if( button.ifThisIsTextBox )
-            continue;
-        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
-            button.SetColor(sf::Color::Blue);
-        }
-        else {
-            button.SetColor(sf::Color::Black);
-        }
+        if(button.ifThisIsTextBox) continue;
+        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {button.SetColor(sf::Color::Blue);}
+        else {button.SetColor(sf::Color::Black);}
     }
     for (Button &button : buttonsChooseVertex) {
-        if( button.ifThisIsTextBox )
-            continue;
-        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {//czy myszka jest w prostokacie przycisku
-            button.SetColor(sf::Color::Blue);
-        }
-        else {
-            button.SetColor(sf::Color::Black);
-        }
+        if(button.ifThisIsTextBox) continue;
+        if (button.rectangle.getGlobalBounds().contains(mousePosition.x,mousePosition.y) ) {button.SetColor(sf::Color::Blue);}
+        else {button.SetColor(sf::Color::Black);}
     }
-
 }
 
 void Application::Run() {    
-    for(Vertex v2: G.vertices) {
-        std::cerr<<"V: "<<v2.id<<std::endl;
-    }    
+    for(Vertex v2: G.vertices) {std::cerr<<"V: "<<v2.id<<std::endl;}    
     std::cerr<<"edges:"<<std::endl;
-    for(Edge e2:G.allEdges) {
-        std::cerr<<"E: "<<e2.id<<" "<<e2.idVertexFrom<<", "<<e2.idVertexTo<<std::endl;}
+    for(Edge e2:G.allEdges) {std::cerr<<"E: "<<e2.id<<" "<<e2.idVertexFrom<<", "<<e2.idVertexTo<<std::endl;}
 
     while (window.isOpen())
     {
@@ -296,11 +294,7 @@ void Application::Run() {
         while (window.pollEvent(event)) {HandleEvent(event);}
 
         sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-        //stepLista.currentStep                
-        //std::cerr<<"steplista: "<<stepLista.G->vertices.size()<<" <-> "<< stepLista.G <<"\n";
-        //std::cerr<<(stepLista.G == sG);
-        //assert((zeroV) || (    (stepLista.G->vertices[0].id >= 0 && stepLista.G->vertices[0].id <= 2) && stepLista.currentStep >= -1   ));
-        
+       
         if(simulateForces)
         {
             G.CalculateForces(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT);//to wtedy i tlyko wtedy gdy aktualny stan na symulacje sily
@@ -310,18 +304,18 @@ void Application::Run() {
                 v.KeepInGraphArea(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT);
             }
         }
-        if( runningForward && aktualnyStan == algorithmR ){
+        if(runningForward && aktualnyStan == algorithmR){
             long double tt= clock();
             tt /= CLOCKS_PER_SEC;
-            if( tt >= lastStep + timeStep ){
+            if(tt >= lastStep + timeStep){
                 lastStep = tt;
                 stepLista.GoRight();
             }
         }
-        if( runningBack && aktualnyStan == algorithmR ){
+        if(runningBack && aktualnyStan == algorithmR){
             long double tt= clock();
             tt /= CLOCKS_PER_SEC;
-            if( tt >= lastStep + timeStep ){
+            if(tt >= lastStep + timeStep){
                 lastStep = tt;
                 stepLista.GoLeft();
             }
@@ -363,77 +357,110 @@ void Application::RenderGraphArea(){
 int TotalLength( std::vector<Button>* buttonsv )
 {
     int totalLength;
-    for (int i=0; i<buttonsv->size(); ++i) {
-        totalLength += (*buttonsv)[i].width + BUTTON_SPACING;
-    }
-    if( buttonsv->size() > 0 )
-        totalLength += BUTTON_SPACING;
+    for (int i=0; i<buttonsv->size(); ++i) {totalLength += (*buttonsv)[i].width + BUTTON_SPACING;}
+    if(buttonsv->size() > 0) totalLength += BUTTON_SPACING;
     return totalLength;
 }
 
+
 void SetPositionsForButtons( std::vector<Button>* buttonsv, Application* app )
 {
-    long double scale, xdb, ydb, btspdb, hdb;
+    long double scale, xdb, ydb, btspdb, hdb, ldb;
     int l;
-    if( TotalLength(buttonsv) <= app->window.getSize().x ){
-        (*buttonsv)[0].x = BUTTON_SPACING;
-        (*buttonsv)[0].scale = 1;
-        (*buttonsv)[0].y = 25;
-        for (int i = 1; i< buttonsv->size();++i) {
-            (*buttonsv)[i].x = (*buttonsv)[i-1].x + (*buttonsv)[i-1].width + BUTTON_SPACING;
-            (*buttonsv)[i].y = 25;
-            (*buttonsv)[i].scale = 1;
+    scale = 1;
+    for( ; scale >= 0.85; scale -= 0.3 ){
+        ldb = TotalLength(buttonsv);
+        ldb *= scale;
+        btspdb = BUTTON_SPACING;
+        btspdb *= scale;
+        if( ldb <= app->window.getSize().x ){
+            l = btspdb;
+            (*buttonsv)[0].x = l;
+            (*buttonsv)[0].scale = scale;
+            (*buttonsv)[0].y = 25;
+            xdb = (*buttonsv)[0].width; //było i, ale i jest podobne do 0
+            xdb *= scale;
+            l += xdb + btspdb;
+            for (int i = 1; i< buttonsv->size();++i) {
+                xdb = (*buttonsv)[i].width;
+                xdb *= scale;
+                l += xdb + btspdb;
+                (*buttonsv)[i].x = (*buttonsv)[i-1].x + (*buttonsv)[i-1].width + BUTTON_SPACING;
+                (*buttonsv)[i].y = 25;
+                (*buttonsv)[i].scale = 1;
+            }
         }
     }
-    else{
-        int i = 0;
-        l = BUTTON_SPACING;
+    int i = 0;
+    l = BUTTON_SPACING;
+    for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+        l += (*buttonsv)[i].width + BUTTON_SPACING;
+        i++;
+    }
+    if( l > app->window.getSize().x ){
+        i--;
+        l -= (*buttonsv)[i].width + BUTTON_SPACING;
+    }
+    l = BUTTON_SPACING;
+    for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+        l += (*buttonsv)[i].width + BUTTON_SPACING;
+        i++;
+    }
+    if( l <= app->window.getSize().x ){
+        i = 0, l = BUTTON_SPACING;
         for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+            (*buttonsv)[i].x = l;
+            (*buttonsv)[i].y = 2;
+            (*buttonsv)[i].scale = 1;
             l += (*buttonsv)[i].width + BUTTON_SPACING;
             i++;
         }
         if( l > app->window.getSize().x ){
             i--;
-            l -= (*buttonsv)[i].width + BUTTON_SPACING;
         }
         l = BUTTON_SPACING;
         for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+            (*buttonsv)[i].x = l;
+            (*buttonsv)[i].y = 52;
+            (*buttonsv)[i].scale = 1;
             l += (*buttonsv)[i].width + BUTTON_SPACING;
             i++;
         }
-        if( l <= app->window.getSize().x ){
-            i = 0, l = BUTTON_SPACING;
-            for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
-                (*buttonsv)[i].x = l;
-                (*buttonsv)[i].y = 2;
-                (*buttonsv)[i].scale = 1;
-                l += (*buttonsv)[i].width + BUTTON_SPACING;
-                i++;
+    }else{
+        for( int k = 3; k < 100; k++ ){
+            i = 0;
+            scale = 2;
+            scale /= k;
+            hdb = BUTTON_HEIGHT;
+            hdb *= scale;
+            btspdb = BUTTON_SPACING;
+            btspdb *= scale;
+            for( int j = 0; j < k; j++ )
+            {
+                l = btspdb;
+                for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+                    xdb = (*buttonsv)[i].width;
+                    xdb *= scale;
+                    l += xdb + btspdb;
+                    i++;
+                }
+                if( l > app->window.getSize().x ){
+                    i--;
+                    xdb = (*buttonsv)[i].width;
+                    xdb *= scale;
+                    l -= xdb + btspdb;
+                }
             }
-            if( l > app->window.getSize().x ){
-                i--;
-            }
-            l = BUTTON_SPACING;
-            for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
-                (*buttonsv)[i].x = l;
-                (*buttonsv)[i].y = 52;
-                (*buttonsv)[i].scale = 1;
-                l += (*buttonsv)[i].width + BUTTON_SPACING;
-                i++;
-            }
-        }else{
-            for( int k = 3; k < 100; k++ ){
+            if( i == buttonsv->size() ){
                 i = 0;
-                scale = 2;
-                scale /= k;
-                hdb = BUTTON_HEIGHT;
-                hdb *= scale;
-                btspdb = BUTTON_SPACING;
-                btspdb *= scale;
                 for( int j = 0; j < k; j++ )
                 {
                     l = btspdb;
+                    ydb = 2 + ( hdb + 2.5 ) * j;
                     for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
+                        (*buttonsv)[i].x = l;
+                        (*buttonsv)[i].y = ydb;
+                        (*buttonsv)[i].scale = scale;
                         xdb = (*buttonsv)[i].width;
                         xdb *= scale;
                         l += xdb + btspdb;
@@ -446,30 +473,7 @@ void SetPositionsForButtons( std::vector<Button>* buttonsv, Application* app )
                         l -= xdb + btspdb;
                     }
                 }
-                if( i == buttonsv->size() ){
-                    i = 0;
-                    for( int j = 0; j < k; j++ )
-                    {
-                        l = btspdb;
-                        ydb = 2 + ( hdb + 2.5 ) * j;
-                        for( ; l <= app->window.getSize().x && i < buttonsv->size(); ){
-                            (*buttonsv)[i].x = l;
-                            (*buttonsv)[i].y = ydb;
-                            (*buttonsv)[i].scale = scale;
-                            xdb = (*buttonsv)[i].width;
-                            xdb *= scale;
-                            l += xdb + btspdb;
-                            i++;
-                        }
-                        if( l > app->window.getSize().x ){
-                            i--;
-                            xdb = (*buttonsv)[i].width;
-                            xdb *= scale;
-                            l -= xdb + btspdb;
-                        }
-                    }
-                    break;
-                }
+                break;
             }
         }
     }

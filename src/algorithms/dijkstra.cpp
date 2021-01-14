@@ -37,7 +37,7 @@ void DIJKSTRA(Graph *G,StepList *StepListPtr, std::vector<int> &chosenV) {
     //std::vector<bool> vis(GKopia.vertices.size());
     while (!Q.empty()) {
         int v = Q.top().second;
-        int distance = Q.top().first * (-1); 
+        int distance = Q.top().first; 
         Q.pop();
         std::cerr<<"jestem w v="<<v<<"\n";
         if(GKopia.vertices[v].data1 < distance) continue;
