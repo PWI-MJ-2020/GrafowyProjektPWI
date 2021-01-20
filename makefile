@@ -1,7 +1,7 @@
-TARGET_EXEC ?= ProjektProgram				# nazwa programu
+TARGET_EXEC ?= GraphVisualizer				# nazwa programu
 
 BUILD_DIR ?= ./build
-SRC_DIRS ?= ./src
+SRC_DIRS ?= ./src/*
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

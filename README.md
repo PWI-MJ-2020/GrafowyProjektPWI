@@ -6,13 +6,27 @@ Program oferuje możliwość tworzenia, edycji, wczytywania oraz zapisu grafu. P
 
 #### Instalacja niezbędnych zależności
 Zalecane jest uruchomienie programu na systemach z rodziny Linux. Pozwala on na łatwą instalację potrzebnych pakietów:
-sudo apt-get install libsfml-dev
+`sudo apt-get install libsfml-dev`
+`sudo apt install build-essential`
 
 #### Uruchomienie programu
-????
+Dzięki utworzonemu plikowi `makefile` kompilacja jest prosta i intuicyjna. Polega na wejściu w lokalizację pobranego repozytorium oraz wpisaniu polecenia:
+`make`
+Powstanie wtedy plik wykonywalny `GraphVisualizer`, który należy wykonać poleceniem
+`./GraphVisualizer`
+
+Jednak w przypadku, gdy powyższy sposób okaże się nieskuteczny, przewidziana jest również druga,
+zastępcza metoda kompilacji i uruchomienia. Po wejściu do katalogu repozytorium w terminalu należy wpisać:
+`g++ -c src/*.cpp src/algorithms/*.cpp src/graphics/*.cpp`
+`g++ *.o -o GraphVisualizer -lsfml-graphics -lsfml-window -lsfml-system`
+
 
 #### Wykorzystane bibloteki
 SFML 2.5.1
 Język programowania C++ w standardzie 17
 
 #### Autorzy
+Mikołaj Jaszcza
+Michał Kierul
+Marcin Wróbel
+Marcin Sarnecki
