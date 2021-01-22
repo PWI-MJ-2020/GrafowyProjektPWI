@@ -69,6 +69,8 @@ void dfs_reku2(Graph &G, StepList* DFSStepList, int v) {
 }
 
 void SCC(Graph *G,StepList *StepListPtr, std::vector<int>  &chosenV) {  
+    G->isDirected = 1;
+
     nr = 1;
     idx = 0; 
     cdx = 0;

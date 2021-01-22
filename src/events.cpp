@@ -103,7 +103,7 @@ void Application::HandleMouseButtonPressed(sf::Event &event) {
                         v.isBeingChosen = true;
                     }else if( secondVertexId == -1 ) {
                         secondVertexId = v.id;
-                        G.AddEdge( firstVertexId, secondVertexId, 0, 0 );                    
+                        G.AddEdge( firstVertexId, secondVertexId, 1, 1 );                    
                         G.vertices [ firstVertexId ].isBeingChosen = false;
                         firstVertexId = -1;
                         secondVertexId = -1;
@@ -195,10 +195,9 @@ void Application::HandleTextEntered(sf::Event &event) {
     }
 
     if (aktualnyStan == editE && selectedEdgeId != -1) {
-        if     ((int)letter == 45) {G.allEdges[selectedEdgeId].weight1 *= (-1);}
-        else if((int)letter == 13) {ClearSelected();} // Enter
-        else if((int)letter == 8) {G.allEdges[selectedEdgeId].weight1 /= 10;} // Backspace
-        else if(G.allEdges[selectedEdgeId].weight1 <= (INT_MAX - 100) / 10 && int(letter) - 48 >= 0 && int(letter) - 48 <= 9){
+             if ((int)letter == 13) {ClearSelected();} // Enter
+        else if ((int)letter == 8) {G.allEdges[selectedEdgeId].weight1 /= 10;} // Backspace
+        else if (G.allEdges[selectedEdgeId].weight1 <= (INT_MAX - 100) / 10 && int(letter) - 48 >= 0 && int(letter) - 48 <= 9){
                 G.allEdges[selectedEdgeId].weight1 = G.allEdges[selectedEdgeId].weight1 * 10 + (int(letter) - 48);
         }
     }

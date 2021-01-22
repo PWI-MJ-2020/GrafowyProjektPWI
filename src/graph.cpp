@@ -29,7 +29,7 @@ float getLength(sf::Vector2f p1, sf::Vector2f p2) {//odległość między dwoma 
 
 Graph::Graph(sf::Font * f) {
     font = f;
-    isDirected = true;
+    isDirected = false;
     isWeighted = false;
 }
 
@@ -222,7 +222,7 @@ void Graph::Draw(sf::RenderTarget& window, bool editLook, bool editEdges){
 
         if (editLook) {
             if (edge.isHighlighted) {
-                edge.color = sf::Color::Yellow;
+                edge.color = sf::Color(141,166,0);
             } else {
                 edge.color = sf::Color::Black;    
             }
