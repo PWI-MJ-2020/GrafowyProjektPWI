@@ -165,7 +165,7 @@ Application::Application()
 {
     if (!font.loadFromFile("Fonts/OpenSans-Regular.ttf"))
 		throw("NIE MA CZCIONKI\n");
-   
+    
     G = Graph(&font);
     stepLista = StepList(&G);
     aktualnyStan    = addV;
@@ -173,9 +173,16 @@ Application::Application()
     secondVertexId  = -1;    
     holdingVertexId = -1;
     simulateForces = false;
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 0;
+    settings.antialiasingLevel = 8;
     
+    sf::RenderTexture fejktekstura;
+    while(!fejktekstura.create(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT,settings)) {
+        settings.antialiasingLevel/=2;
+    }
+    fejktekstura.clear(sf::Color::Blue);
+
+
+
     runningForward = false;
     runningBack = false;
     timeStep = (1.f/16.f); 
@@ -319,8 +326,6 @@ void Application::Render() {
 }
 
 void Application::RenderGraphArea(){
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
     
     sf::RenderTexture GraphArea;
     GraphArea.create(window.getSize().x,window.getSize().y-TOOLBAR_HEIGHT,settings);
@@ -490,8 +495,6 @@ void SetPositionsForButtons( std::vector<Button>* buttonsv, Application* app )
 }
 
 void Application::RenderToolBar() {
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
     
     sf::RenderTexture toolBar;
     toolBar.create(window.getSize().x,TOOLBAR_HEIGHT,settings);
@@ -543,8 +546,6 @@ void Application::RenderToolBar() {
 }
 
 void Application::RenderTextTyping() {
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
     sf::Text inputboxtext;
     inputboxtext.setFont(font);
     inputboxtext.setString(textEntered);
