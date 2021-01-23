@@ -8,8 +8,9 @@
 //-> 100% sprawdzanie istnienia folderu przy makedir
 //-> 100% wywalić debug
 //-> 100% usunąć komentarzed zbędne
-//-> 50% przykładowe grafy
-//-> zrobienie i mergowanie brancha
+//-> 100% przykładowe grafy
+//-> 100% zrobienie i mergowanie brancha
+//-> 100% editEdge nie zeruje highlighted
 -> poprawa kolorów {
     RĘCZNIE!!!! ????
     zmienić kolory dla algorytmów

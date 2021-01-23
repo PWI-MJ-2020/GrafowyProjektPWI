@@ -119,8 +119,8 @@ void Application::HandleMouseButtonPressed(sf::Event &event) {
             for (Edge &e: G.allEdges) {
                 int dx = e.dataPoint.x - event.mouseButton.x;
                 int dy = e.dataPoint.y - (event.mouseButton.y - TOOLBAR_HEIGHT);
-                e.isHighlighted = false;
                 if (sqrt(dx*dx+dy*dy) <= V_DATA_RADIUS) {
+                    ClearSelected();
                     selectedEdgeId = e.id; 
                     e.isHighlighted = true;
                     break;

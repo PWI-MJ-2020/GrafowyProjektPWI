@@ -1,4 +1,4 @@
-# Projekt GraphVisualizer
+# Graph Visualizer 1.0.0
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Lines of Code](https://tokei.rs/b1/github/marwar22/GraphVisualizer)](https://github.com/marwar22/GraphVisualizer) [![GitHub contributors](https://img.shields.io/github/contributors/marwar22/GraphVisualizer)](https://GitHub.com/marwar22/GraphVisualizer/graphs/contributors/) [![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
@@ -6,7 +6,7 @@
 
 
 ## Wstęp
-Program oferuje możliwość tworzenia, edycji, wczytywania oraz zapisu grafu. Pozwala na wizualizację krok po kroku działania szeregu algorytmów takich jak DFS, BFS, algorytm Dijkstry, wyznaczanie kolejności wierzchołków postorder, podział grafu na silnie spójne składowe. Rozbudowany silnik fizyczny umożliwia w zautomatyzowany sposób estetycznie rozmieścić wierzchołki i krawędzie w polu edycji grafu. Zapis oraz odczyt do pliku pozwalają na kontynuację pracy nawet po przerwaniu wykonywania programu. Zmiany kolorów zarówno wierzchołków jak i krawędzi podczas wykonywania kolejnych kroków algorytmów pozwalają na przejrzystą obserwację sposobu działania algorytmu. Interaktywne poruszanie się po liście kroków algorytmu, ze szczególnym uzwględnieniem w pełni działającej możliwości cofania tych dotychczasowo wykonanych, pozwala na dogłębną analizę i pełne zrozumienie podstaw algorytmiki. Program może być świetnym dopełnieniem klasycznej formy nauczania algorytmów, w szczególności dla zawodników oraz potencjalnych zawodników Olimpiady Informatycznej, Olimpiady Informatycznej Juniorów oraz innych osób zaczynających swoją przygodę w świecie algorytmiki konkursowej. 
+Program oferuje możliwość tworzenia, edycji, wczytywania oraz zapisu grafu. Pozwala na wizualizację krok po kroku działania szeregu algorytmów takich jak DFS, BFS, algorytm Dijkstry, wyznaczanie kolejności wierzchołków postorder, podział grafu na silnie spójne składowe i inne. Rozbudowany silnik fizyczny pomaga w zautomatyzowany sposób estetycznie rozmieścić wierzchołki i krawędzie w polu edycji grafu. Zapis oraz odczyt do pliku pozwalają na kontynuację pracy nawet po przerwaniu wykonywania programu. Zmiany kolorów zarówno wierzchołków jak i krawędzi podczas wykonywania kolejnych kroków algorytmów pozwalają na przejrzystą obserwację sposobu działania algorytmu. Interaktywne poruszanie się po liście kroków algorytmu, ze szczególnym uzwględnieniem w pełni działającej możliwości cofania tych dotychczasowo wykonanych, pozwala na dogłębną analizę i pełne zrozumienie podstaw algorytmiki. Program może być świetnym dopełnieniem klasycznej formy nauczania algorytmów, w szczególności dla zawodników oraz potencjalnych zawodników Olimpiady Informatycznej, Olimpiady Informatycznej Juniorów oraz innych osób zaczynających swoją przygodę w świecie algorytmiki konkursowej. 
 
 
 ## Instalacja niezbędnych zależności
@@ -60,7 +60,7 @@ Aby usunąć wierzchołek należy nacisnąć przycisk "Usuń wierzchołek", a na
 Aby usunąć wierzchołek należy nacisnąć przycisk "Przesuń wierzchołek", a następnie przytrzymać wierzchołek i upuścić go w docelowym miejscu.
 
 #### Dodawanie krawędzi
-Aby dodać krawędź należy kliknąć "Dodaj krawędź", a następnie kliknąć kolejno 2 wierzchołki. Krawędź zostanie utworzona od pierwszego do drugiego. Kolejność wyboru jest istotna jeżeli chcemy, by nasz graf był skierowany.
+Aby dodać krawędź należy kliknąć "Dodaj krawędź", a następnie kliknąć kolejno 2 wierzchołki. Krawędź zostanie utworzona od pierwszego do drugiego. Kolejność wyboru jest istotna jeżeli chcemy, by nasz graf był skierowany. Twórcy zapewnili wsparcie dla krawędzi wielokrotnych oraz tzw. "pętli" (ang. self-loops).
 
 #### Usuwanie krawędzi
 Aby usunąć krawędź należy kliknąć "Usuń krawędź". Na środkach krawędzi pojawią się pomocnicze okrągłe pola - aby usunąć wybraną krawędź należy kliknąć na pole w jej centrum.
@@ -69,23 +69,23 @@ Aby usunąć krawędź należy kliknąć "Usuń krawędź". Na środkach krawęd
 Chcąc zmienić wagę krawędzi należy kliknąć "Edycja krawędzi", a następnie kliknąć odpowiednie pole analogicznie do procesu usuwania krawędzi. Następnie należy wpisać wagę krawędzi i zakończyć wciśnięciem "Enter"
 
 #### Automatyczne rozmieszczenie grafu
-W celu skorzystania z automatycznego rozmieszczenia wierzchołków i krawędzi w głównym obszarze roboczym należy kliknąć "Symulacja sił". Analogiczne działanie należy podjąć w celu wyłączenia sił działających na graf.
+W celu skorzystania z automatycznego rozmieszczenia wierzchołków i krawędzi, używającego zaawansowanego silnika fizycznego, w głównym obszarze roboczym należy kliknąć "Symulacja sił". Analogiczne działanie należy podjąć w celu wyłączenia sił działających na graf.
 
 #### Odczyt grafu z pliku
-Zapisane projekty korzystają z własnego rozrzerzenia `*.gv`. Aby odczytać własne, jak i uprzednio dodane przez autorów przykładowe grafy, należy kliknąć przycisk "Odczyt z pliku", a następnie w polu które pojawi się na środku ekranu należy wpisać nazwę pliku, który chcemy odczytać (w przypadku pominięcia rozszerzenia zostanie ono dodane automatyczne) i zakończyć operację wciśnięciem `Enter`.
+Zapisane przez program pliki korzystają z własnego rozrzerzenia `*.gv`. Aby odczytać własne, jak i uprzednio dodane przez autorów przykładowe grafy, należy kliknąć przycisk "Odczyt z pliku", a następnie w polu które pojawi się na środku ekranu należy wpisać nazwę pliku, który chcemy odczytać (w przypadku pominięcia rozszerzenia zostanie ono dodane automatyczne) i zakończyć operację wciśnięciem `Enter`.
 
 #### Zapis grafu do pliku
-Podobnie w przypadku chęci zapisania grafu  - należy kliknąć przycisk "Zapis do pliku", oraz wpisać jego nazwę. Należy pamiętać, aby przypadkowo nie nadpisać uprzednio zapisanego pliku o tej samej nazwie. Podobnie, na koniec należy wcisnąć przycisk `Enter`. Projekty są odczytywane jak i zapisywane w dedykowanym do tego folderze `savedGraphs`, który jest podkatalogiem projektu.
+Podobnie w przypadku chęci zapisania grafu  - należy kliknąć przycisk "Zapis do pliku", oraz wpisać jego nazwę. Należy pamiętać, aby przypadkowo nie nadpisać uprzednio zapisanego pliku o tej samej nazwie. Podobnie, na koniec należy wcisnąć przycisk `Enter`. Projekty są odczytywane jak i zapisywane w dedykowanym do tego folderze `savedGraphs`, który jest podkatalogiem projektu. Lista stworzonych plików przykładowych dostępna jest w części "Struktura projektu" tego dokumentu, podkatalog: `savedGraphs`. 
 
 #### Skierowanie grafu
-Aby zmienić graf skierowany w nieskierowany bądź wykonać operację przeciwną, należy kliknąć przycisk "Graf skierowany". Należy pamiętać, że nawet jeśli do pewnych algorytmów (takich jak algorytm Prima) przekażemy graf skierowany, algorytm automatycznie zostanie na czas trwania wizualizacji algorytmu przekonwertowany na swój nieskierowany odpowiednik. Analogicznie skierowanie zostanie włączone dla algorytmu znajdowania silnie spójnych składowych.
+Aby zmienić graf nieskierowany w skierowany bądź wykonać operację przeciwną, należy kliknąć przycisk "Graf skierowany". Należy pamiętać, że nawet jeśli do pewnych algorytmów (takich jak algorytm Prima) przekażemy graf skierowany, graf automatycznie zostanie na czas trwania wizualizacji algorytmu przekonwertowany na swój nieskierowany odpowiednik. Analogicznie skierowanie zostanie włączone dla algorytmu znajdowania silnie spójnych składowych.
 
 ### Wizualizacje algorytmów
 Aby przejść do panelu wyboru algorytmów, należy kliknąć przycisk "Wybierz algorytm". Następnie, po kliknięciu przycisku powiązanego z wybranym algorytmem, użytkownik zostaje przeniesiony do nowego panelu. W przypadku  wyboru "Powrót" użytkownik zostanie z powrotem przeniesiony do panelu edycji grafu.
 
 Wszystkie algorytmy, poza algorytmami "Kolory" i "SCC" wymagają wyboru wierzchołka początkowego. W tym celu należy kliknąć w wybrany wierzchołek. 
 
-Następnie użytkownik znajduje się w polu docelowym - w polu wizualizacji wybranego algorytmu. Do jego dyspozycji oddajemy zarówno możliwość ręcznej nawigacji w przód i tył po liście kroków algorytmu (za pomocą przycisków "->" i "<-"), oraz wersję zautomatuzowaną - przyciski "<" i ">" określają, czy kroki mają być wykonywane wstecz czy naprzód.  Działanie przycisku "| |" odpowiada poleceniom `play/pause`. Ponadto przyciski "-" i "+" pozwalają zmniejszyć i zwiększyć prędkość prezentacji kroków algorytmów. Pole tekstowe po prawej stronie informuje o aktualnej prędkości odtwarzania.
+Następnie użytkownik znajduje się w polu docelowym - w polu wizualizacji wybranego algorytmu. Do jego dyspozycji oddajemy zarówno możliwość ręcznej nawigacji w przód i tył po liście kroków algorytmu (za pomocą przycisków "->" i "<-"), oraz wersję zautomatuzowaną - przyciski "<" i ">" rozpoczynające automatyczne wykonywanie kroków wykonywaych odpowiednio wstecz bądź naprzód.  Działanie przycisku "||" odpowiada poleceniu `pause`. Ponadto przyciski "-" i "+" pozwalają zmniejszyć i zwiększyć prędkość prezentacji kroków algorytmów. Pole tekstowe po prawej stronie informuje o aktualnej prędkości odtwarzania.
 
 ## Struktura projektu
 ```.
@@ -107,6 +107,28 @@ Następnie użytkownik znajduje się w polu docelowym - w polu wizualizacji wybr
     |     ├── button.hpp
     |     ├── textbox.cpp
     |     └── textbox.hpp
+    └── savedGraphs
+    |     ├── bipartial1.gv
+    |     ├── bipartial2.gv
+    |     ├── clique7.gv
+    |     ├── cycle1.gv
+    |     ├── cycle2.gv
+    |     ├── Dij_dir_example1.gv
+    |     ├── Dij_dir_example2.gv
+    |     ├── Dij_undir_example1.gv
+    |     ├── Dij_undir_example2.gv
+    |     ├── duzo.gv
+    |     ├── MST_example1.gv
+    |     ├── MST_example2.gv
+    |     ├── niespojny.gv
+    |     ├── path1.gv
+    |     ├── path2.gv
+    |     ├── SCC_example1.gv
+    |     ├── SCC_example2.gv
+    |     ├── tree1.gv
+    |     ├── tree2.gv
+    |     └── tree3.gv
+    |     
     ├── app.cpp
     ├── app.hpp
     ├── edge.cpp
@@ -122,10 +144,8 @@ Następnie użytkownik znajduje się w polu docelowym - w polu wizualizacji wybr
     ├── vertex.cpp
     └── vertex.hpp
 ```
-
+## Wersja
+Obecna wersja programu: 1.0.0
 
 ## Autorzy
-Mikołaj Jaszcza
-Michał Kierul
-Marcin Wróbel
-Marcin Sarnecki
+Mikołaj Jaszcza | Michał Kierul | Marcin Wróbel | Marcin Sarnecki
